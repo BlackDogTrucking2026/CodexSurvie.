@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Codex Survie</title>
+<meta name="theme-color" content="#12171a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Codex Survie">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#12171a;--bg2:#1a2125;--card:#20292e;--line:#2f3a40;--tx:#e8e2d6;--mut:#94a0a6;--acc:#ff7a1a;--red:#e5484d;--ok:#46a758;--warn:#f5b400;--blue:#4c9be8;
+--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(var(--st) + 10px) 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header h1{font-size:19px;margin:0;letter-spacing:.3px;flex:1}
+header h1 b{color:var(--acc)}
+#netState{font-size:12px;padding:3px 8px;border-radius:20px;background:var(--card);color:var(--mut)}
+main{padding:14px 14px calc(90px + var(--sb));max-width:760px;margin:0 auto}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--bg2);border-top:1px solid var(--line);display:flex;padding-bottom:var(--sb)}
+nav button{flex:1;min-width:0;background:none;border:0;color:var(--mut);font-size:10px;padding:8px 0 7px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button span{font-size:20px;line-height:1}
+nav button.on{color:var(--acc)}
+.page{display:none}.page.on{display:block}
+h2{font-size:20px;margin:6px 0 12px}
+h3{font-size:16px;margin:18px 0 8px;color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:11px 14px;font-size:15px;cursor:pointer;text-decoration:none;font-family:inherit}
+.btn.acc{background:var(--acc);border-color:var(--acc);color:#1a0d00;font-weight:600}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
+.btn.sm{padding:7px 10px;font-size:13px;border-radius:9px}
+.btn.full{width:100%}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;color:var(--tx);font-family:inherit;font-size:14px}
+.tile span{display:block;font-size:28px;margin-bottom:4px}
+.big112{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--red);color:#fff;border-radius:16px;padding:16px;text-decoration:none;font-weight:700;font-size:22px;margin-bottom:12px}
+.big112 small{display:block;font-weight:400;font-size:13px;opacity:.9}
+.stat{font-size:28px;font-weight:700}
+.mut{color:var(--mut);font-size:13px}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;background:var(--bg2);border:1px solid var(--line);color:var(--mut)}
+.pill.r{color:#fff;background:var(--red);border-color:var(--red)}
+.pill.w{color:#1a1200;background:var(--warn);border-color:var(--warn)}
+.pill.g{color:#fff;background:var(--ok);border-color:var(--ok)}
+input,select,textarea{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:10px;font-size:16px;font-family:inherit}
+textarea{min-height:80px}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 4px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.list .it{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--line);cursor:pointer}
+.list .it:last-child{border-bottom:0}
+.list .it .ic{font-size:24px;width:34px;text-align:center}
+.list .it .tt{flex:1}
+.list .it .tt b{display:block}
+.chk{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.chk input{width:22px;height:22px;flex:0 0 22px;accent-color:var(--acc)}
+.chk .x{margin-left:auto;background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer}
+.chk.done span{color:var(--mut);text-decoration:line-through}
+.bar{height:8px;background:var(--bg2);border-radius:8px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--acc)}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tabs button{background:var(--card);border:1px solid var(--line);color:var(--mut);border-radius:20px;padding:7px 13px;font-size:14px;white-space:nowrap;cursor:pointer;font-family:inherit}
+.tabs button.on{color:#1a0d00;background:var(--acc);border-color:var(--acc)}
+.sub{display:none}.sub.on{display:block}
+.detail{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto;display:none;padding:calc(var(--st) + 10px) 16px calc(30px + var(--sb))}
+.detail.on{display:block}
+.detail .top{display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg);padding:6px 0 10px}
+.detail h2{margin:0;flex:1}
+.steps{counter-reset:s;padding:0;margin:0;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:10px 10px 10px 46px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.steps li:before{content:counter(s);position:absolute;left:10px;top:10px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#1a0d00;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.warnbox{background:#3a1d1d;border:1px solid var(--red);border-radius:12px;padding:12px;margin:10px 0;font-size:14px}
+.infobox{background:#1d2a3a;border:1px solid var(--blue);border-radius:12px;padding:12px;margin:10px 0;font-size:14px}
+ul.dots{padding-left:20px;margin:6px 0}
+ul.dots li{margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500;font-size:12px}
+#overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;background:#fff;color:#000}
+#overlay.on{display:flex}
+#overlay .ctl{position:absolute;bottom:calc(30px + var(--sb));left:0;right:0;display:flex;gap:10px;justify-content:center}
+#overlay .btn{background:#222;color:#fff;border-color:#222}
+#compassDial{width:240px;height:240px;margin:10px auto;position:relative}
+#compassDial svg{width:100%;height:100%;transition:transform .15s linear}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.morse{font-family:ui-monospace,Menlo,monospace;font-size:20px;letter-spacing:2px;word-break:break-all;color:var(--acc)}
+#toast{position:fixed;left:50%;bottom:calc(84px + var(--sb));transform:translateX(-50%);background:#000c;color:#fff;padding:9px 14px;border-radius:20px;font-size:14px;z-index:60;display:none}
+.srch{margin-bottom:12px}
+.hl{color:var(--acc);font-weight:600}
+@media(min-width:700px){nav{max-width:760px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
+</style>
+</head>
+<body>
+<header><h1>🧭 Codex <b>Survie</b></h1><span id="netState">…</span></header>
+
+<main>
+<!-- ACCUEIL -->
+<section class="page on" id="p-home">
+  <a class="big112" id="callMain" href="tel:112"><span style="font-size:30px;white-space:nowrap">📞 112</span><small style="flex:1">Numéro d'urgence européen · gratuit · sans crédit</small></a>
+  <div class="card">
+    <div class="row"><label style="margin:0">Pays</label><select id="countrySel" style="flex:2"></select></div>
+    <div id="countryNums" style="margin-top:8px"></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="mut">💧 Autonomie eau</div><div class="stat" id="hWater">–</div><div class="mut" id="hWaterSub"></div></div>
+    <div class="card"><div class="mut">🥫 Autonomie nourriture</div><div class="stat" id="hFood">–</div><div class="mut" id="hFoodSub"></div></div>
+  </div>
+  <div class="card">
+    <div class="row"><b style="flex:1">🎒 Sac d'urgence 72 h</b><span id="hKitPct" class="pill">0 %</span></div>
+    <div class="bar"><i id="hKitBar" style="width:0"></i></div>
+    <div id="hAlerts"></div>
+  </div>
+  <div class="grid3">
+    <button class="tile" onclick="sos.start()"><span>🆘</span>SOS lumineux</button>
+    <button class="tile" onclick="torch.on()"><span>🔦</span>Lampe</button>
+    <button class="tile" onclick="go('tools','t-gps')"><span>📍</span>Ma position</button>
+    <button class="tile" onclick="go('tools','t-med')"><span>🩺</span>Fiche médicale</button>
+    <button class="tile" onclick="go('aid')"><span>⛑️</span>Premiers secours</button>
+    <button class="tile" onclick="go('comm','c-msg')"><span>✉️</span>Messages</button>
+    <button class="tile" onclick="go('sec','s-places')"><span>📌</span>Autour de moi</button>
+    <button class="tile" onclick="go('sec','s-perso')"><span>🛡️</span>Réflexes sécurité</button>
+    <button class="tile" onclick="go('sec','s-risks')"><span>⚠️</span>Risques locaux</button>
+    <button class="tile" onclick="go('kit','k-ppe')"><span>🦺</span>Mes EPI</button>
+    <button class="tile" onclick="go('kit','k-ppe');openSub('e-sit')"><span>🎯</span>EPI par situation</button>
+    <button class="tile" onclick="go('sec','s-equip')"><span>🔐</span>Équip. sécurité</button>
+    <button class="tile" onclick="go('sec','s-equip');openSub('q-guide')"><span>📱</span>iPhone urgence</button>
+    <button class="tile" onclick="go('kit','k-bag')"><span>🎒</span>Sac 72 h</button>
+    <button class="tile" onclick="go('surv','v-lvl')"><span>📈</span>Niveaux de prépa</button>
+    <button class="tile" onclick="go('surv','v-eq')"><span>🏕️</span>Matériel survie</button>
+    <button class="tile" onclick="go('surv','v-nrj')"><span>⚡</span>Autonomie élec.</button>
+  </div>
+  <p class="mut" style="margin-top:14px">Toutes les données restent sur cet appareil. L'appli fonctionne sans réseau une fois installée. Pense à faire une sauvegarde (Outils → Sauvegarde).</p>
+</section>
+
+<!-- GUIDES -->
+<section class="page" id="p-guides">
+  <h2>Guides de survie</h2>
+  <input class="srch" id="gSearch" placeholder="🔎 Rechercher (eau, feu, inondation…)">
+  <div class="card list" id="gList" style="padding:0"></div>
+</section>
+
+<!-- SECOURS -->
+<section class="page" id="p-aid">
+  <h2>Premiers secours</h2>
+  <div class="warnbox"><b>Toujours : Protéger → Alerter (15 / 112) → Secourir.</b><br>Ces fiches rappellent les gestes de base et ne remplacent pas une formation (PSC1 en France, cours de secourisme de la Croix-Rouge, etc.).</div>
+  <input class="srch" id="aSearch" placeholder="🔎 Rechercher (saignement, brûlure, arrêt…)">
+  <div class="card list" id="aList" style="padding:0"></div>
+</section>
+
+<!-- KIT -->
+<section class="page" id="p-kit">
+  <h2>Kit &amp; stocks</h2>
+  <div class="tabs" data-group="kit">
+    <button data-sub="k-bag" class="on">🎒 Sac 72 h</button>
+    <button data-sub="k-stock">📦 Stocks</button>
+    <button data-sub="k-ppe">🦺 EPI</button>
+    <button data-sub="k-home">🏠 Foyer</button>
+  </div>
+  <div class="sub on" id="k-bag">
+    <div class="card"><div class="row"><b style="flex:1">Avancement</b><span id="bagPct" class="pill">0 %</span></div><div class="bar"><i id="bagBar" style="width:0"></i></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" onclick="bag.reset()">Tout décocher</button><button class="btn sm" onclick="bag.restore()">Liste par défaut</button></div></div>
+    <div id="bagList"></div>
+    <div class="card"><label>Ajouter un objet</label><div class="row"><input id="bagNew" placeholder="ex. Chargeur allume-cigare"><button class="btn acc" style="flex:0 0 auto" onclick="bag.add()">+</button></div></div>
+  </div>
+  <div class="sub" id="k-stock">
+    <div class="card">
+      <b>Ajouter un stock</b>
+      <label>Article</label><input id="stName" placeholder="ex. Eau en bouteille 1,5 L">
+      <div class="row"><div><label>Catégorie</label><select id="stCat"><option value="eau">💧 Eau</option><option value="food">🥫 Nourriture</option><option value="med">💊 Pharmacie</option><option value="energy">🔋 Énergie / piles</option><option value="other">🧰 Autre</option></select></div>
+      <div><label>Quantité</label><input id="stQty" type="number" inputmode="decimal" step="any" value="1"></div></div>
+      <div class="row"><div><label id="stUnitLbl">Litres par unité</label><input id="stUnit" type="number" inputmode="decimal" step="any" value="1.5"></div>
+      <div><label>Péremption</label><input id="stExp" type="date"></div></div>
+      <button class="btn acc full" style="margin-top:12px" onclick="stock.add()">Ajouter</button>
+    </div>
+    <div id="stList"></div>
+  </div>
+  <div class="sub" id="k-ppe">
+    <div class="tabs" data-group="ppe">
+      <button data-sub="e-inv" class="on">📋 Inventaire</button>
+      <button data-sub="e-sit">🎯 Par situation</button>
+      <button data-sub="e-guide">📘 Bien choisir</button>
+    </div>
+    <div class="sub on" id="e-inv">
+      <div class="card"><div class="row"><b style="flex:1">Équipement possédé</b><span id="ppePct" class="pill">0 %</span></div><div class="bar"><i id="ppeBar" style="width:0"></i></div>
+      <p class="mut">Coche ce que tu possèdes, puis touche ✎ pour noter la taille, l'emplacement et la date limite (péremption, révision, contrôle). Une alerte apparaît sur l'accueil 30 jours avant l'échéance.</p></div>
+      <div id="ppeList"></div>
+      <div class="card"><b>Ajouter un équipement</b>
+        <div class="row"><div><label>Zone protégée</label><select id="ppeNewCat"></select></div></div>
+        <label>Désignation</label><input id="ppeNewN" placeholder="ex. Combinaison jetable type 5/6">
+        <button class="btn acc full" style="margin-top:10px" onclick="ppe.add()">Ajouter</button></div>
+    </div>
+    <div class="sub" id="e-sit"><div id="ppeSit"></div></div>
+    <div class="sub" id="e-guide"><input class="srch" id="ppeGSearch" placeholder="🔎 Rechercher (FFP3, gants, S3…)"><div class="card list" id="ppeGList" style="padding:0"></div></div>
+  </div>
+  <div class="sub" id="k-home">
+    <div class="card">
+      <b>Mon foyer</b>
+      <div class="row"><div><label>Adultes</label><input id="hhAdults" type="number" min="0" inputmode="numeric"></div><div><label>Enfants</label><input id="hhKids" type="number" min="0" inputmode="numeric"></div><div><label>Animaux</label><input id="hhPets" type="number" min="0" inputmode="numeric"></div></div>
+      <div class="row"><div><label>Eau L/pers/jour</label><input id="hhWater" type="number" step="0.5" inputmode="decimal"></div><div><label>kcal/adulte/jour</label><input id="hhKcal" type="number" step="100" inputmode="numeric"></div></div>
+      <div class="row"><div><label>Eau L/animal/jour</label><input id="hhPetWater" type="number" step="0.5" inputmode="decimal"></div><div><label>Objectif (jours)</label><input id="hhTarget" type="number" inputmode="numeric"></div></div>
+      <p class="mut">Repères : 3 L d'eau par personne et par jour (boisson + hygiène minimale), un enfant compte pour ~0,6 adulte en calories. Les autorités françaises conseillent de tenir au moins 3 jours (72 h) en autonomie.</p>
+    </div>
+    <div class="card" id="hhResult"></div>
+  </div>
+</section>
+
+<!-- OUTILS -->
+<section class="page" id="p-tools">
+  <h2>Outils</h2>
+  <div class="tabs" data-group="tools">
+    <button data-sub="t-sos" class="on">🆘 SOS</button>
+    <button data-sub="t-gps">📍 Position</button>
+    <button data-sub="t-cmp">🧭 Boussole</button>
+    <button data-sub="t-med">🩺 Fiche</button>
+    <button data-sub="t-morse">··– Morse</button>
+    <button data-sub="t-save">💾 Sauvegarde</button>
+  </div>
+  <div class="sub on" id="t-sos">
+    <div class="grid2">
+      <button class="tile" onclick="torch.on()"><span>🔦</span>Lampe écran</button>
+      <button class="tile" onclick="sos.start()"><span>🆘</span>SOS lumineux + sonore</button>
+      <button class="tile" onclick="whistle.toggle()"><span>📢</span><span id="whLbl" style="font-size:14px;display:inline">Sifflet</span></button>
+      <button class="tile" onclick="strobe.start()"><span>⚡</span>Stroboscope</button>
+    </div>
+    <div class="infobox">Le signal SOS (··· ––– ···) est reconnu partout. En montagne, le signal de détresse international est <b>6 signaux par minute</b> (un toutes les 10 s), puis 1 minute de pause ; la réponse se fait par 3 signaux par minute. Sur iPhone, la vraie lampe torche reste plus puissante que l'écran : Centre de contrôle → 🔦.</div>
+  </div>
+  <div class="sub" id="t-gps">
+    <div class="card">
+      <button class="btn acc full" onclick="gps.get()">📍 Obtenir ma position</button>
+      <div id="gpsOut" style="margin-top:12px" class="mut">Fonctionne sans réseau (GPS), plus lentement à l'intérieur.</div>
+    </div>
+  </div>
+  <div class="sub" id="t-cmp">
+    <div class="card" style="text-align:center">
+      <div id="compassDial"><svg viewBox="0 0 200 200" id="cmpSvg">
+        <circle cx="100" cy="100" r="95" fill="#20292e" stroke="#2f3a40" stroke-width="3"/>
+        <g font-size="18" font-weight="700" text-anchor="middle" fill="#e8e2d6"><text x="100" y="28" fill="#ff7a1a">N</text><text x="178" y="106">E</text><text x="100" y="186">S</text><text x="22" y="106">O</text></g>
+        <polygon points="100,38 110,100 100,108 90,100" fill="#ff7a1a"/><polygon points="100,162 110,100 100,92 90,100" fill="#94a0a6"/>
+      </svg></div>
+      <div class="stat" id="cmpDeg">–°</div><div class="mut" id="cmpTxt">Appuie sur « Activer » puis tiens le téléphone à plat.</div>
+      <button class="btn acc" style="margin-top:10px" onclick="compass.start()">Activer la boussole</button>
+      <p class="mut">Sur Mac, il n'y a pas de capteur : utilise les méthodes sans boussole (Guides → S'orienter).</p>
+    </div>
+  </div>
+  <div class="sub" id="t-med">
+    <div class="card">
+      <b>Fiche médicale d'urgence (ICE)</b>
+      <p class="mut">À montrer aux secours. Sur iPhone, remplis aussi la « Fiche médicale » de l'app Santé : elle est lisible depuis l'écran verrouillé.</p>
+      <div class="row"><div><label>Nom, prénom</label><input data-med="name"></div><div><label>Date de naissance</label><input data-med="dob" type="date"></div></div>
+      <div class="row"><div><label>Groupe sanguin</label><select data-med="blood"><option></option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div><div><label>Poids (kg)</label><input data-med="weight" type="number" inputmode="decimal"></div></div>
+      <label>Allergies</label><textarea data-med="allergies"></textarea>
+      <label>Traitements en cours</label><textarea data-med="meds"></textarea>
+      <label>Antécédents / informations utiles</label><textarea data-med="history"></textarea>
+      <label>Médecin traitant</label><input data-med="doctor">
+      <label>Personne à prévenir 1 (nom + n°)</label><input data-med="ice1">
+      <label>Personne à prévenir 2 (nom + n°)</label><input data-med="ice2">
+      <div class="row" style="margin-top:12px"><button class="btn acc" onclick="med.show()">👁 Afficher en grand</button><button class="btn" onclick="med.copy()">Copier</button></div>
+    </div>
+  </div>
+  <div class="sub" id="t-morse">
+    <div class="card">
+      <label>Texte à convertir</label><input id="morseIn" value="SOS" autocapitalize="characters">
+      <div class="morse" id="morseOut" style="margin:10px 0"></div>
+      <div class="row"><button class="btn acc" onclick="morse.play(false)">🔊 Jouer</button><button class="btn" onclick="morse.play(true)">💡 Lumière + son</button><button class="btn" onclick="morse.stop()">■ Stop</button></div>
+    </div>
+    <div class="card"><b>Alphabet morse</b><div id="morseTable" class="mono" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px;font-size:14px"></div></div>
+  </div>
+  <div class="sub" id="t-save">
+    <div class="card">
+      <b>Sauvegarder mes données</b>
+      <p class="mut">Stocks, sac, foyer, fiche médicale, plan familial et messages. À refaire après chaque modification importante ; garde une copie dans Notes, par mail ou sur une clé USB.</p>
+      <div class="row"><button class="btn acc" onclick="backup.download()">⬇ Fichier</button><button class="btn" onclick="backup.copy()">Copier le texte</button></div>
+      <label>Restaurer (fichier ou texte collé)</label>
+      <input type="file" id="bkFile" accept=".json,application/json,text/plain">
+      <textarea id="bkText" placeholder="…ou colle ici le texte de sauvegarde"></textarea>
+      <button class="btn full" style="margin-top:8px" onclick="backup.restoreText()">Restaurer depuis le texte</button>
+      <div id="bkMsg" class="mut" style="margin-top:8px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITE -->
+<section class="page" id="p-sec">
+  <h2>Sécurité &amp; environnement proche</h2>
+  <div class="tabs" data-group="sec">
+    <button data-sub="s-perso" class="on">🛡️ Réflexes</button>
+    <button data-sub="s-places">📌 Autour de moi</button>
+    <button data-sub="s-risks">⚠️ Risques locaux</button>
+    <button data-sub="s-equip">🔐 Équipement</button>
+    <button data-sub="s-neigh">🤝 Voisins</button>
+  </div>
+  <div class="sub on" id="s-perso">
+    <input class="srch" id="sSearch" placeholder="🔎 Rechercher (agression, domicile, camion…)">
+    <div class="card list" id="sList" style="padding:0"></div>
+  </div>
+  <div class="sub" id="s-places">
+    <div class="infobox">Repère <b>à l'avance</b>, pendant qu'Internet fonctionne, les lieux utiles près de chez toi (ou d'un lieu de stationnement habituel). Les fiches restent consultables hors ligne.</div>
+    <div class="card">
+      <b>Chercher autour de ma position</b>
+      <p class="mut">Ouvre Plans avec la recherche autour de toi (Internet nécessaire).</p>
+      <div id="nearBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+    <div class="card">
+      <b>Ajouter un lieu</b>
+      <div class="row"><div><label>Type</label><select id="plType"></select></div><div><label>Distance / temps</label><input id="plDist" placeholder="ex. 800 m, 5 min à pied"></div></div>
+      <label>Nom</label><input id="plName" placeholder="ex. Pharmacie du Centre">
+      <label>Adresse / repère</label><input id="plAddr">
+      <label>Téléphone, horaires, notes</label><input id="plNote">
+      <div class="row" style="margin-top:10px"><button class="btn" onclick="places.here()">📍 Lieu = ma position</button><button class="btn acc" onclick="places.add()">Ajouter</button></div>
+      <div id="plPos" class="mut"></div>
+    </div>
+    <div id="plList"></div>
+    <div class="card"><b>À repérer en priorité</b><div id="plTodo" class="mut" style="margin-top:6px"></div></div>
+  </div>
+  <div class="sub" id="s-risks">
+    <div class="card">
+      <b>Mon adresse de référence</b><input data-risk="addr" placeholder="ex. domicile, commune">
+      <p class="mut">En France, la liste officielle des risques de ta commune est sur <a href="https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi" target="_blank" rel="noopener" style="color:var(--acc)">Géorisques</a> (georisques.gouv.fr → « Connaître les risques près de chez moi »). Le <b>DICRIM</b> de ta mairie détaille les consignes et lieux d'accueil. Coche ce qui te concerne :</p>
+    </div>
+    <div id="rkList"></div>
+    <div class="card"><b>Itinéraires de sortie</b>
+      <label>Itinéraire 1 pour quitter la zone</label><input data-risk="route1">
+      <label>Itinéraire 2 (autre direction)</label><input data-risk="route2">
+      <label>Lieu d'accueil / point haut / refuge prévu</label><input data-risk="refuge">
+      <label>Notes (DICRIM, sirène la plus proche, centre de secours…)</label><textarea data-risk="notes"></textarea>
+    </div>
+  </div>
+  <div class="sub" id="s-equip">
+    <div class="tabs" data-group="seq">
+      <button data-sub="q-inv" class="on">📋 Inventaire</button>
+      <button data-sub="q-guide">📘 Fiches</button>
+    </div>
+    <div class="sub on" id="q-inv">
+      <div class="card"><div class="row"><b style="flex:1">Équipement de sécurité</b><span id="seqPct" class="pill">0</span></div><div class="bar"><i id="seqBar" style="width:0"></i></div>
+      <p class="mut">Coche ce que tu as ou ce qui est configuré. ✎ pour l'emplacement et une date (changement de pile, contrôle de l'extincteur…).</p></div>
+      <div id="seqList"></div>
+      <div class="card"><b>Ajouter</b><label>Catégorie</label><select id="seqNewCat"></select><label>Désignation</label><input id="seqNewN"><button class="btn acc full" style="margin-top:10px" onclick="seq.add()">Ajouter</button></div>
+    </div>
+    <div class="sub" id="q-guide"><input class="srch" id="seqGSearch" placeholder="🔎 Rechercher (iPhone, loi, cabine…)"><div class="card list" id="seqGList" style="padding:0"></div></div>
+  </div>
+  <div class="sub" id="s-neigh">
+    <div class="card">
+      <b>Voisins et contacts de proximité</b>
+      <p class="mut">Les premières aides viennent presque toujours des voisins. Note qui peut aider (compétences, matériel) et qui pourrait avoir besoin d'aide (personne âgée, isolée, sans voiture).</p>
+      <label>Nom</label><input id="nbName">
+      <div class="row"><div><label>Téléphone</label><input id="nbTel" type="tel"></div><div><label>Adresse</label><input id="nbAddr"></div></div>
+      <label>Peut aider / a besoin d'aide (secouriste, groupe électrogène, 4×4, personne fragile…)</label><input id="nbNote">
+      <button class="btn acc full" style="margin-top:10px" onclick="neigh.add()">Ajouter</button>
+    </div>
+    <div id="nbList"></div>
+  </div>
+</section>
+
+<!-- SURVIVALISTE -->
+<section class="page" id="p-surv">
+  <h2>Survivaliste</h2>
+  <div class="tabs" data-group="surv">
+    <button data-sub="v-lvl" class="on">📈 Niveaux</button>
+    <button data-sub="v-bush">🌲 Bushcraft</button>
+    <button data-sub="v-bad">🏡 Base de repli</button>
+    <button data-sub="v-nrj">⚡ Énergie</button>
+    <button data-sub="v-food">🥕 Potager &amp; conserves</button>
+    <button data-sub="v-eq">🎒 Équipement</button>
+  </div>
+  <div class="sub on" id="v-lvl">
+    <div class="infobox">Se préparer par paliers : chaque niveau s'appuie sur le précédent. Inutile de viser l'autonomie totale d'un coup ; un foyer qui tient 2 semaines est déjà mieux préparé que la grande majorité.</div>
+    <div id="lvlList"></div>
+  </div>
+  <div class="sub" id="v-bush">
+    <input class="srch" id="bushSearch" placeholder="🔎 Rechercher (nœuds, tarp, carte…)">
+    <div class="card list" id="bushList" style="padding:0"></div>
+  </div>
+  <div class="sub" id="v-bad">
+    <div class="card">
+      <b>Ma base de repli</b>
+      <p class="mut">Un lieu où aller si le domicile devient inhabitable ou dangereux : famille, ami, résidence secondaire, terrain. Idéalement à plus de 50 km, dans une autre direction que les risques locaux.</p>
+      <label>Lieu (adresse / repère)</label><input data-bad="place">
+      <div class="row"><div><label>Distance</label><input data-bad="dist" placeholder="km / heures"></div><div><label>Contact sur place</label><input data-bad="contact"></div></div>
+      <label>Itinéraire principal</label><input data-bad="r1">
+      <label>Itinéraire de secours (sans autoroute)</label><input data-bad="r2">
+      <label>Itinéraire à pied / vélo (si routes bloquées)</label><input data-bad="r3">
+      <label>Eau sur place (réseau, puits, source, rivière…)</label><input data-bad="water">
+      <label>Chauffage / cuisson sur place</label><input data-bad="heat">
+      <label>Stock déjà sur place</label><textarea data-bad="stock"></textarea>
+      <label>Clés / accès</label><input data-bad="keys">
+      <label>Notes</label><textarea data-bad="notes"></textarea>
+    </div>
+    <div class="card"><b>Décider de partir : critères</b>
+      <ul class="dots"><li>Ordre d'évacuation des autorités : partir, sans discuter.</li><li>Logement inhabitable (inondé, incendié, sans chauffage par grand froid, structure endommagée).</li><li>Danger qui se rapproche et que tu ne peux pas fuir plus tard (feu, crue, nuage toxique : dans ce dernier cas, la consigne est plutôt le confinement).</li><li>Plus d'eau potable ni de moyen d'en obtenir sur place.</li></ul>
+      <p class="mut">Dans la plupart des crises, <b>rester chez soi bien préparé</b> est plus sûr que de prendre la route avec tout le monde. Partir tôt vaut mieux que partir dans les bouchons.</p></div>
+    <div class="card"><b>Véhicule prêt à partir</b><div id="bovList"></div></div>
+  </div>
+  <div class="sub" id="v-nrj">
+    <div class="card"><b>Calculateur d'autonomie électrique</b>
+      <p class="mut">Indique tes appareils indispensables. Le calcul donne la consommation par jour et ce que ta batterie et ton panneau solaire peuvent couvrir.</p>
+      <div id="nrjRows"></div>
+      <button class="btn sm" onclick="nrj.addRow()">+ Appareil</button>
+      <div class="row" style="margin-top:12px"><div><label>Capacité batterie (Wh)</label><input id="nrjCap" type="number" inputmode="numeric"></div><div><label>Panneau solaire (W)</label><input id="nrjSol" type="number" inputmode="numeric"></div><div><label>Heures de plein soleil</label><input id="nrjSun" type="number" step="0.5" inputmode="decimal"></div></div>
+      <p class="mut">Plein soleil équivalent en France : environ 1 à 2 h/jour en hiver, 4 à 6 h en été. Le panneau produit rarement plus de 70 % de sa puissance nominale.</p>
+    </div>
+    <div class="card" id="nrjOut"></div>
+    <div class="card"><b>Repères</b><ul class="dots">
+      <li><b>Station électrique LiFePO4</b> : la chimie la plus sûre et la plus durable (environ 3 000 cycles). Recharge par prise, allume-cigare 12/24 V ou panneau solaire.</li>
+      <li><b>Groupe électrogène</b> : uniquement dehors, à plusieurs mètres des ouvertures, jamais dans un garage même porte ouverte. Stocker l'essence en jerricans homologués, avec stabilisant, en rotation.</li>
+      <li>Économiser avant de produire : LED, appareils 12 V, glacière à compresseur plutôt que réfrigérateur sur onduleur.</li>
+      <li>Piles : standardiser sur un seul format (AA) pour lampe, radio, talkies ; préférer le lithium pour le froid et le stockage long.</li></ul></div>
+  </div>
+  <div class="sub" id="v-food">
+    <input class="srch" id="foodSearch" placeholder="🔎 Rechercher (bocaux, séchage, semences…)">
+    <div class="card list" id="foodList" style="padding:0"></div>
+  </div>
+  <div class="sub" id="v-eq">
+    <div class="card"><div class="row"><b style="flex:1">Équipement survivaliste</b><span id="sqPct" class="pill">0</span></div><div class="bar"><i id="sqBar" style="width:0"></i></div>
+    <p class="mut">Modèles de référence choisis pour leur fiabilité et leur rapport qualité/prix. Prix indicatifs relevés en novembre 2026 : ils varient selon le vendeur. ✎ pour noter l'emplacement et une date (péremption des filtres, révision…).</p></div>
+    <div id="sqList"></div>
+    <div class="card"><b>Ajouter</b><label>Catégorie</label><select id="sqNewCat"></select><label>Désignation</label><input id="sqNewN"><button class="btn acc full" style="margin-top:10px" onclick="survEq.add()">Ajouter</button></div>
+    <div class="warnbox">Couteau, hachette et scie : en France, leur port et leur transport hors du domicile sont interdits sans motif légitime. Un usage de randonnée, de bivouac ou de travail le justifie ; pas la « défense ». Voir Sécurité → Équipement → Objets d'autodéfense.</div>
+  </div>
+</section>
+
+<!-- COMM -->
+<section class="page" id="p-comm">
+  <h2>Communication</h2>
+  <div class="tabs" data-group="comm">
+    <button data-sub="c-plan" class="on">👪 Plan familial</button>
+    <button data-sub="c-msg">✉️ Messages</button>
+    <button data-sub="c-radio">📻 Radio</button>
+    <button data-sub="c-alert">🚨 Alertes</button>
+  </div>
+  <div class="sub on" id="c-plan">
+    <div class="card">
+      <b>Plan de communication familial</b>
+      <p class="mut">À décider à l'avance avec ta famille, puis à imprimer ou recopier sur papier pour chacun.</p>
+      <label>Point de rendez-vous 1 — près du domicile</label><input data-plan="rdv1" placeholder="ex. devant la mairie">
+      <label>Point de rendez-vous 2 — hors du quartier</label><input data-plan="rdv2">
+      <label>Point de rendez-vous 3 — hors de la ville / région</label><input data-plan="rdv3">
+      <label>Contact relais hors zone (tout le monde l'appelle pour donner des nouvelles)</label><input data-plan="relay" placeholder="Nom + numéro">
+      <label>Contacts de la famille (un par ligne : nom — numéro)</label><textarea data-plan="contacts"></textarea>
+      <label>École / travail / crèche — consignes de récupération</label><textarea data-plan="school"></textarea>
+      <label>Heures de vacation radio convenues (ex. toutes les heures paires, canal PMR 8)</label><input data-plan="radio">
+      <label>Mot code « tout va bien » / « besoin d'aide »</label><input data-plan="code">
+      <button class="btn acc full" style="margin-top:12px" onclick="plan.show()">👁 Afficher la fiche</button>
+    </div>
+  </div>
+  <div class="sub" id="c-msg">
+    <div class="infobox">En crise, <b>préfère le SMS à l'appel</b> : il passe même quand le réseau est saturé, consomme peu de batterie et laisse les lignes libres pour les secours. En France, le <b>114</b> reçoit les SMS d'urgence (personnes sourdes, ou quand on ne peut pas parler).</div>
+    <div class="card"><label>Ta position à insérer (optionnel)</label><div class="row"><input id="msgPos" placeholder="Appuie sur 📍"><button class="btn" style="flex:0 0 auto" onclick="msgs.fillPos()">📍</button></div></div>
+    <div id="msgList"></div>
+    <div class="card"><b>Nouveau modèle</b><label>Titre</label><input id="msgNewT"><label>Texte (utilise {POS} pour la position)</label><textarea id="msgNewB"></textarea><button class="btn acc full" style="margin-top:8px" onclick="msgs.add()">Ajouter</button></div>
+  </div>
+  <div class="sub" id="c-radio">
+    <div class="card">
+      <b>Radio FM / AM — s'informer</b>
+      <ul class="dots">
+        <li>Garde une <b>radio à piles, dynamo ou solaire</b> : elle fonctionne quand Internet et le mobile tombent.</li>
+        <li>En France, les radios locales du réseau <b>ici</b> (ex-France Bleu) ont une convention avec les préfectures pour diffuser les consignes en cas de crise. France Info et France Inter relaient aussi.</li>
+        <li>Au Luxembourg : radio 100,7 et RTL ; en Belgique : RTBF / VRT ; en Suisse : SRF / RTS (diffusion des consignes officielles).</li>
+        <li>Note les fréquences locales de ta zone ici :</li>
+      </ul>
+      <textarea data-plan="freqs" placeholder="ex. ici Lorraine Nord 98.5 FM"></textarea>
+    </div>
+    <div class="card">
+      <b>Talkies-walkies PMR446</b> <span class="pill">sans licence · UE</span>
+      <p class="mut">Portée 1 à 5 km en terrain dégagé, beaucoup moins en ville. Puissance max 0,5 W, antenne fixe.</p>
+      <table id="pmrTable"><tr><th>Canal</th><th>Fréquence (MHz)</th><th>Canal</th><th>Fréquence (MHz)</th></tr></table>
+      <p class="mut">Convention répandue : canal 8 (code 0) pour un premier appel / urgences en randonnée, puis on dégage vers un canal convenu. Ce n'est pas une règle officielle : à convenir à l'avance avec ton groupe.</p>
+    </div>
+    <div class="card">
+      <b>CB 27 MHz</b> <span class="pill">sans licence en Europe</span>
+      <table><tr><th>Canal</th><th>Fréquence</th><th>Usage</th></tr>
+      <tr><td>9</td><td>27,065 MHz</td><td>Canal d'urgence / appel de détresse</td></tr>
+      <tr><td>19</td><td>27,185 MHz</td><td>Routiers, infos route (FM en France, AM ailleurs selon les habitudes)</td></tr>
+      <tr><td>27</td><td>27,275 MHz</td><td>Appel général dans plusieurs pays</td></tr></table>
+      <p class="mut">Avec une CB dans le camion, le canal 19 reste un bon moyen d'avoir des nouvelles de la route quand le réseau mobile est coupé.</p>
+    </div>
+    <div class="card">
+      <b>Bonnes pratiques radio</b>
+      <ul class="dots"><li>Écouter avant de parler, messages courts.</li><li>Appel : « [destinataire] de [toi], parlez ».</li><li>Détresse : « MAYDAY MAYDAY MAYDAY », qui, où, quoi, combien de personnes.</li><li>Vacations à heures fixes pour économiser les batteries.</li><li>Piles de rechange au lithium : meilleure tenue au froid.</li></ul>
+    </div>
+  </div>
+  <div class="sub" id="c-alert">
+    <div class="card">
+      <b>🔔 FR-Alert / EU-Alert</b>
+      <p>Les autorités envoient des alertes sur tous les téléphones d'une zone, sans inscription, même si le réseau est saturé (diffusion cellulaire). Vérifie que les alertes sont activées : <span class="mono">Réglages → Notifications → Alertes gouvernementales</span> (tout en bas).</p>
+    </div>
+    <div class="card">
+      <b>📢 Sirène du réseau d'alerte (France, SAIP)</b>
+      <ul class="dots">
+        <li><b>Début d'alerte :</b> son modulé montant et descendant, 3 cycles d'environ 1 min 41 s séparés par 5 s de silence.</li>
+        <li><b>Fin d'alerte :</b> son continu de 30 s.</li>
+        <li><b>Essai :</b> le 1er mercredi du mois à midi, un seul cycle de 1 min 41 s.</li>
+      </ul>
+      <button class="btn" onclick="siren.toggle()" id="sirenBtn">▶ Écouter un exemple (15 s)</button>
+    </div>
+    <div class="card">
+      <b>Que faire quand la sirène sonne ?</b>
+      <ol class="steps">
+        <li><b>Se mettre à l'abri</b> dans le bâtiment le plus proche (ni voiture, ni extérieur). Fermer portes et fenêtres, couper ventilation et chauffage si alerte chimique.</li>
+        <li><b>S'informer</b> : radio, FR-Alert, sites officiels.</li>
+        <li><b>Ne pas aller chercher les enfants à l'école</b> : les établissements ont un plan de mise en sûreté.</li>
+        <li><b>Limiter les appels</b> pour laisser le réseau aux secours. Un SMS suffit.</li>
+        <li>Ne sortir qu'à la <b>fin de l'alerte</b> ou sur consigne des autorités.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<nav id="nav">
+  <button data-p="home" class="on"><span>🏠</span>Accueil</button>
+  <button data-p="guides"><span>📖</span>Guides</button>
+  <button data-p="aid"><span>⛑️</span>Secours</button>
+  <button data-p="kit"><span>🎒</span>Kit</button>
+  <button data-p="tools"><span>🔦</span>Outils</button>
+  <button data-p="sec"><span>🛡️</span>Sécurité</button>
+  <button data-p="surv"><span>🏕️</span>Survie</button>
+  <button data-p="comm"><span>📻</span>Comm</button>
+</nav>
+
+<div class="detail" id="detail"><div class="top"><button class="btn sm" onclick="closeDetail()">← Retour</button><h2 id="dTitle"></h2></div><div id="dBody"></div></div>
+<div id="overlay"><div id="ovText" style="font-size:22px;font-weight:700;text-align:center;padding:20px"></div><div class="ctl"><button class="btn" id="ovDim">Luminosité</button><button class="btn" onclick="overlayOff()">✕ Fermer</button></div></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- stockage ---------- */
+var store = {
+  get: function (k, d) { try { var v = localStorage.getItem("cs_" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { localStorage.setItem("cs_" + k, JSON.stringify(v)); } catch (e) {} }
+};
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function toast(t) { var el = $("toast"); el.textContent = t; el.style.display = "block"; clearTimeout(toast._t); toast._t = setTimeout(function () { el.style.display = "none"; }, 2200); }
+function copyText(t) {
+  function fb() { var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("Copié"); } catch (e) { toast("Copie impossible"); } document.body.removeChild(ta); }
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(function () { toast("Copié"); }, fb); } else fb(); } catch (e) { fb(); }
+}
+function todayStr() { var d = new Date(); return d.toISOString().slice(0, 10); }
+function daysUntil(s) { if (!s) return null; var d = new Date(s + "T12:00:00"); return Math.round((d - new Date()) / 86400000); }
+
+/* ---------- navigation ---------- */
+function go(p, sub) {
+  var btns = document.querySelectorAll("#nav button");
+  for (var i = 0; i < btns.length; i++) btns[i].classList.toggle("on", btns[i].getAttribute("data-p") === p);
+  var pages = document.querySelectorAll(".page");
+  for (var j = 0; j < pages.length; j++) pages[j].classList.toggle("on", pages[j].id === "p-" + p);
+  if (sub) openSub(sub);
+  window.scrollTo(0, 0);
+  if (p === "home") renderHome();
+  store.set("page", p);
+}
+function openSub(id) {
+  var el = $(id); if (!el) return;
+  var parent = el.parentNode, ch = parent.children, i, j;
+  for (i = 0; i < ch.length; i++) {
+    if (ch[i].classList.contains("sub")) ch[i].classList.toggle("on", ch[i] === el);
+    if (ch[i].classList.contains("tabs")) { var tb = ch[i].children; for (j = 0; j < tb.length; j++) tb[j].classList.toggle("on", tb[j].getAttribute("data-sub") === id); }
+  }
+}
+document.getElementById("nav").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) go(b.getAttribute("data-p")); });
+document.addEventListener("click", function (e) { var b = e.target.closest(".tabs button"); if (b) openSub(b.getAttribute("data-sub")); });
+
+/* ---------- réseau ---------- */
+function netUpd() { var on = navigator.onLine; $("netState").textContent = on ? "● en ligne" : "● hors ligne"; $("netState").style.color = on ? "var(--ok)" : "var(--warn)"; }
+window.addEventListener("online", netUpd); window.addEventListener("offline", netUpd);
+
+/* ---------- numéros d'urgence ---------- */
+var COUNTRIES = [
+  ["FR", "🇫🇷 France", [["112", "Urgence européenne"], ["15", "SAMU (urgence médicale)"], ["17", "Police / gendarmerie"], ["18", "Pompiers"], ["114", "Urgence par SMS / tchat (sourds, ou si on ne peut pas parler)"], ["196", "Secours en mer (CROSS)"], ["116 117", "Médecin de garde (soir, week-end)"]]],
+  ["LU", "🇱🇺 Luxembourg", [["112", "Pompiers, ambulance, urgence"], ["113", "Police"], ["8002 5500", "Centre antipoison"]]],
+  ["BE", "🇧🇪 Belgique", [["112", "Pompiers, ambulance"], ["101", "Police"], ["070 245 245", "Centre antipoisons"]]],
+  ["DE", "🇩🇪 Allemagne", [["112", "Pompiers, ambulance"], ["110", "Police"], ["116 117", "Médecin de garde"]]],
+  ["NL", "🇳🇱 Pays-Bas", [["112", "Toutes urgences"], ["0900 8844", "Police (non urgent)"]]],
+  ["CH", "🇨🇭 Suisse", [["112", "Urgence"], ["144", "Ambulance"], ["117", "Police"], ["118", "Pompiers"], ["1414", "Rega (sauvetage aérien)"], ["145", "Tox Info"]]],
+  ["IT", "🇮🇹 Italie", [["112", "Urgence (numéro unique dans la plupart des régions)"], ["118", "Urgence médicale"], ["113", "Police"], ["115", "Pompiers"], ["1530", "Garde-côtes"]]],
+  ["ES", "🇪🇸 Espagne", [["112", "Toutes urgences"], ["061", "Urgence médicale (selon région)"], ["091", "Police nationale"], ["062", "Guardia Civil"]]],
+  ["PT", "🇵🇹 Portugal", [["112", "Toutes urgences"], ["808 24 24 24", "SNS 24 (conseil santé)"]]],
+  ["DK", "🇩🇰 Danemark", [["112", "Urgence"], ["114", "Police (non urgent)"]]],
+  ["SE", "🇸🇪 Suède", [["112", "Urgence"], ["114 14", "Police (non urgent)"], ["1177", "Conseil santé"]]],
+  ["NO", "🇳🇴 Norvège", [["112", "Police"], ["113", "Ambulance"], ["110", "Pompiers"], ["116 117", "Médecin de garde"]]],
+  ["FI", "🇫🇮 Finlande", [["112", "Toutes urgences"], ["116 117", "Conseil médical"]]],
+  ["AT", "🇦🇹 Autriche", [["112", "Urgence"], ["144", "Ambulance"], ["133", "Police"], ["122", "Pompiers"], ["140", "Secours en montagne"]]],
+  ["GB", "🇬🇧 Royaume-Uni", [["999", "Toutes urgences"], ["112", "Fonctionne aussi"], ["111", "NHS (non urgent)"]]]
+];
+function telHref(n) { return "tel:" + n.replace(/\s/g, ""); }
+function renderCountry() {
+  var c = store.get("country", "FR"), sel = $("countrySel"), html = "", i, k;
+  if (!sel.options.length) { for (i = 0; i < COUNTRIES.length; i++) { var o = document.createElement("option"); o.value = COUNTRIES[i][0]; o.textContent = COUNTRIES[i][1]; sel.appendChild(o); } }
+  sel.value = c;
+  for (i = 0; i < COUNTRIES.length; i++) if (COUNTRIES[i][0] === c) {
+    var nums = COUNTRIES[i][2];
+    for (k = 0; k < nums.length; k++) html += '<a class="it" href="' + telHref(nums[k][0]) + '" style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--tx);text-decoration:none"><b style="min-width:92px;color:var(--acc)">' + esc(nums[k][0]) + '</b><span>' + esc(nums[k][1]) + "</span></a>";
+  }
+  $("countryNums").innerHTML = html + '<p class="mut">Le 112 fonctionne dans toute l\'UE, même sans carte SIM ou sans réseau de ton opérateur (le téléphone passe par n\'importe quel réseau disponible). Si tu ne peux pas parler : SMS au 114 en France.</p>';
+}
+$("countrySel").addEventListener("change", function () { store.set("country", this.value); renderCountry(); });
+
+/* ---------- contenus : guides ---------- */
+var GUIDES = [
+ {id:"water",ic:"💧",t:"Rendre l'eau potable",k:"eau potable purifier filtrer bouillir javel",b:
+ "<p>Sans eau on tient environ 3 jours. Toute eau d'origine inconnue (rivière, pluie stagnante, réseau après une inondation) doit être traitée.</p>"+
+ "<h3>1. Clarifier</h3><ol class='steps'><li>Laisser reposer pour que les particules tombent au fond.</li><li>Filtrer à travers un tissu propre, un filtre à café ou plusieurs couches de tissu. Ça ne rend <b>pas</b> l'eau potable, mais ça rend les étapes suivantes efficaces.</li></ol>"+
+ "<h3>2. Désinfecter (une méthode au choix)</h3><ol class='steps'><li><b>Ébullition</b> : faire bouillir à gros bouillons pendant <b>1 minute</b> (<b>3 minutes</b> au-dessus de 2 000 m d'altitude). C'est la méthode la plus sûre.</li><li><b>Pastilles</b> (Aquatabs, Micropur…) : suivre la notice, en général 30 min d'attente, plus si l'eau est froide.</li><li><b>Eau de Javel</b> non parfumée à 2,6 % (format des berlingots dilués) : environ 4 gouttes par litre ; à 5–6 % : 2 gouttes par litre. Mélanger, attendre <b>30 minutes</b>. L'eau doit garder une légère odeur de chlore ; sinon refaire une dose et attendre 15 min de plus.</li><li><b>Filtre portable</b> (paille, gourde filtrante) : élimine bactéries et parasites, mais pas toujours les virus. À combiner avec une désinfection si l'eau est douteuse.</li><li><b>UV solaire (SODIS)</b> en dernier recours : bouteille PET transparente pleine d'eau claire, 6 h au plein soleil (2 jours si le ciel est couvert).</li></ol>"+
+ "<div class='warnbox'>Aucune de ces méthodes n'élimine les produits chimiques (carburant, pesticides, métaux). Une eau qui sent l'essence ou les produits chimiques n'est pas récupérable.</div>"+
+ "<h3>Réserves cachées dans la maison</h3><ul class='dots'><li>Ballon d'eau chaude : 100 à 200 L. Couper l'arrivée et l'électricité, puis vidanger par le robinet du bas.</li><li>Réservoir de chasse d'eau (pas la cuvette) : à désinfecter.</li><li>Glaçons, conserves de légumes (le jus).</li></ul>"},
+ {id:"fire",ic:"🔥",t:"Faire du feu",k:"feu allumer bois chauffer",b:
+ "<div class='warnbox'>Ne jamais faire de feu, de barbecue ou utiliser un groupe électrogène à l'intérieur : risque d'intoxication au monoxyde de carbone (gaz invisible et inodore, mortel).</div>"+
+ "<h3>Les 3 éléments</h3><ol class='steps'><li><b>Amadou</b> (prend une étincelle) : coton + vaseline, écorce de bouleau, herbes très sèches, copeaux fins, chips de maïs.</li><li><b>Petit bois</b> : brindilles mortes, de l'épaisseur d'une allumette à celle d'un crayon, qui cassent net.</li><li><b>Combustible</b> : branches du poignet au bras. Le bois mort encore sur pied est plus sec que celui au sol.</li></ol>"+
+ "<h3>Monter le feu</h3><ol class='steps'><li>Dégager le sol (2 m autour), protéger du vent, faire un lit de branches si le sol est humide.</li><li>Poser l'amadou, construire un tipi de petit bois autour en laissant une ouverture face au vent.</li><li>Allumer l'amadou, souffler doucement à la base.</li><li>Ajouter progressivement du bois plus gros, sans étouffer les flammes.</li></ol>"+
+ "<h3>Allumage sans briquet</h3><ul class='dots'><li>Pierre à feu (ferrocérium) : gratter vers le bas, en appui sur l'amadou. Marche mouillée.</li><li>Pile 9 V + paille de fer : frotter les bornes contre la laine d'acier.</li><li>Loupe ou lunettes de vue convexes au soleil.</li></ul>"},
+ {id:"shelter",ic:"⛺",t:"Abri et chaleur",k:"abri froid hypothermie dormir couverture",b:
+ "<p>Dehors, le froid tue plus vite que la soif. L'abri passe en premier quand il fait froid, mouillé ou venteux.</p>"+
+ "<ol class='steps'><li><b>S'isoler du sol</b> : le sol vole la chaleur. Épaisseur de branchages, feuilles, sac à dos, carton : au moins 10–15 cm.</li><li><b>Couper le vent et la pluie</b> : bâche, couverture de survie, contre un rocher ou un talus, entrée dos au vent.</li><li><b>Petit volume</b> : un abri juste assez grand pour le corps se réchauffe plus vite.</li><li><b>Rester sec</b> : enlever les vêtements mouillés, superposer des couches, couvrir la tête et le cou.</li><li>Éviter les fonds de vallée (air froid), les lits de rivière (crues) et le dessous des arbres morts.</li></ol>"+
+ "<h3>Dans un véhicule</h3><ul class='dots'><li>Rester dans le véhicule en cas de tempête de neige : il est plus facile à repérer qu'une personne.</li><li>Faire tourner le moteur 10 min par heure seulement, après avoir dégagé le pot d'échappement de la neige ; entrouvrir une vitre côté abrité.</li><li>Couverture de survie : côté doré vers l'extérieur par le froid (convention courante ; l'important est qu'elle soit fermée autour du corps).</li></ul>"},
+ {id:"orient",ic:"🧭",t:"S'orienter sans GPS",k:"orientation nord soleil étoile boussole montre",b:
+ "<h3>Avec le soleil</h3><ul class='dots'><li>Le soleil se lève à l'est et se couche à l'ouest (à peu près). À midi solaire (≈ 13 h en hiver, 14 h en été en France), il est plein <b>sud</b>.</li><li><b>Méthode du bâton</b> : planter un bâton, marquer le bout de l'ombre, attendre 15 min, marquer à nouveau. La ligne de la 1re à la 2e marque va d'ouest en est.</li><li><b>Méthode de la montre à aiguilles</b> (hémisphère nord) : pointer la petite aiguille vers le soleil. Le sud est à mi-chemin entre la petite aiguille et le 12 (le 1 en heure d'été).</li></ul>"+
+ "<h3>La nuit</h3><ul class='dots'><li><b>Étoile polaire</b> = nord. La trouver en prolongeant 5 fois la distance entre les deux étoiles du bord de la « casserole » (Grande Ourse).</li><li>Si on ne voit que la lune : quand elle est en croissant, la ligne qui relie ses deux pointes, prolongée vers le sol, indique grossièrement le sud.</li></ul>"+
+ "<h3>Indices peu fiables</h3><p class='mut'>La mousse « côté nord » des arbres dépend surtout de l'humidité locale : à ne pas utiliser seul.</p>"+
+ "<h3>Si tu es perdu</h3><ol class='steps'><li><b>S'arrêter</b>, s'asseoir, boire, réfléchir (méthode STOP : Stop, Think, Observe, Plan).</li><li>Si quelqu'un sait où tu es : rester sur place, se rendre visible.</li><li>Sinon, suivre une ligne de repère (route, ligne électrique, cours d'eau vers l'aval).</li></ol>"},
+ {id:"power",ic:"🔌",t:"Coupure de courant",k:"panne électricité blackout frigo congélateur",b:
+ "<ol class='steps'><li>Vérifier si la coupure est générale (voisins, éclairage public) ou seulement chez toi (disjoncteur).</li><li>Débrancher les appareils sensibles pour éviter une surtension au retour du courant ; laisser une lampe branchée pour savoir quand ça revient.</li><li>Lampes frontales et à piles plutôt que bougies (risque d'incendie).</li><li>Économiser la batterie du téléphone : mode économie d'énergie, luminosité au minimum, données mobiles coupées entre deux consultations.</li><li>Écouter la radio à piles pour les consignes.</li></ol>"+
+ "<h3>Frigo et congélateur</h3><ul class='dots'><li>Ne pas ouvrir : le réfrigérateur garde le froid environ <b>4 heures</b>.</li><li>Un congélateur plein tient environ <b>48 heures</b>, à moitié plein environ 24 heures.</li><li>Au-delà, jeter viandes, poissons, produits laitiers et restes restés plus de 2 h au-dessus de 4 °C. « Dans le doute, jeter. »</li></ul>"+
+ "<div class='warnbox'>Groupe électrogène, barbecue, chauffage d'appoint à combustion : uniquement dehors, loin des fenêtres. Le monoxyde de carbone tue chaque hiver.</div>"},
+ {id:"flood",ic:"🌊",t:"Inondation",k:"inondation crue eau montée orage pluie",b:
+ "<ol class='steps'><li>S'informer : vigilance crues (Vigicrues en France), radio, FR-Alert.</li><li>Mettre à l'abri papiers, médicaments, objets de valeur à l'étage. Préparer le sac d'urgence.</li><li>Couper gaz et électricité si l'eau approche.</li><li><b>Monter à l'étage</b> ou sur un point haut, avec le kit. Ne pas descendre au sous-sol ou au parking souterrain.</li><li>Ne <b>jamais</b> traverser une zone inondée à pied ou en voiture : 30 cm d'eau suffisent à emporter une voiture, 15 cm d'eau en mouvement font tomber un adulte.</li><li>Ne pas aller chercher les enfants à l'école : ils sont pris en charge.</li><li>Après : ne pas rétablir le courant tant que l'installation n'est pas sèche et vérifiée ; l'eau du robinet peut être contaminée, attendre l'avis de la mairie.</li></ol>"},
+ {id:"heat",ic:"🌡️",t:"Canicule",k:"chaleur canicule déshydratation coup de chaleur",b:
+ "<ol class='steps'><li>Boire régulièrement sans attendre la soif ; manger normalement (le sel compte aussi).</li><li>Fermer volets et fenêtres le jour, aérer la nuit.</li><li>Se rafraîchir : douches, linge humide, brumisateur, 2 à 3 h par jour dans un lieu frais.</li><li>Éviter les efforts aux heures chaudes (11 h – 21 h). Au volant, pauses fréquentes, ne jamais laisser une personne ou un animal dans un véhicule fermé.</li><li>Prendre des nouvelles des personnes âgées et isolées.</li></ol>"+
+ "<div class='warnbox'><b>Coup de chaleur = urgence</b> : peau chaude et sèche, confusion, fièvre &gt; 40 °C, malaise. Appeler le 15/112, mettre à l'ombre, refroidir (eau, ventilation), ne pas faire boire une personne inconsciente.</div>"},
+ {id:"cold",ic:"❄️",t:"Grand froid et neige",k:"froid neige verglas hiver gel",b:
+ "<ol class='steps'><li>Plusieurs couches de vêtements, bonnet, gants, chaussures sèches. Changer de vêtements dès qu'ils sont mouillés.</li><li>Limiter les sorties et les trajets ; en voiture : plein fait, couverture, eau, nourriture, pelle, chargeur.</li><li>Chauffage : ne jamais boucher les aérations, ne pas utiliser de chauffage d'appoint à combustion en continu.</li><li>Surveiller les signes d'hypothermie (frissons intenses, puis confusion et somnolence) et d'engelures (doigts blancs, durs, insensibles).</li></ol>"+
+ "<p class='mut'>Engelures : réchauffer progressivement (eau tiède, pas chaude), ne pas frotter, ne pas réchauffer si un nouveau gel est probable.</p>"},
+ {id:"storm",ic:"🌪️",t:"Tempête et orages",k:"tempête vent orage foudre grêle",b:
+ "<ol class='steps'><li>Rentrer ou fixer ce qui peut s'envoler, rester à l'intérieur loin des fenêtres.</li><li>Éviter les déplacements, surtout en forêt (chutes de branches).</li><li>Orage : se mettre à l'abri dans un bâtiment ou un véhicule fermé (pas une moto ni un vélo). Éviter les arbres isolés, les crêtes, l'eau, les clôtures métalliques.</li><li>Dehors sans abri : s'accroupir pieds joints, loin des autres personnes, ne pas s'allonger.</li><li>Règle des 30 s : si le tonnerre suit l'éclair de moins de 30 s, l'orage est à moins de 10 km, donc dangereux.</li><li>Ne pas toucher les câbles électriques tombés au sol.</li></ol>"},
+ {id:"cbrn",ic:"☢️",t:"Accident industriel / nucléaire",k:"nucléaire chimique industriel nuage toxique confinement iode",b:
+ "<p>Le réflexe : <b>se mettre à l'abri, s'informer, suivre les consignes</b>.</p>"+
+ "<ol class='steps'><li>Entrer dans le bâtiment le plus proche, fermer portes et fenêtres, couper ventilation et climatisation.</li><li>Si tu étais dehors : retirer les vêtements de dessus et les mettre dans un sac, se laver (douche, cheveux).</li><li>Écouter la radio et FR-Alert. Ne pas téléphoner sauf urgence.</li><li><b>Iode stable</b> (accident nucléaire) : à prendre <b>uniquement sur instruction du préfet</b>, aux doses indiquées par la notice. Les riverains des centrales en reçoivent en pharmacie.</li><li>Évacuer seulement sur ordre des autorités, avec le kit d'urgence.</li></ol>"},
+ {id:"evac",ic:"🚗",t:"Évacuation",k:"évacuer partir quitter maison",b:
+ "<ol class='steps'><li>Prendre le sac d'urgence, les papiers (ou leurs copies), les médicaments, les chargeurs, l'animal avec sa laisse et ses papiers.</li><li>Couper gaz, eau, électricité si on te le demande et si tu en as le temps.</li><li>Fermer à clé, laisser un mot indiquant où tu vas (ou prévenir le contact relais).</li><li>Suivre les itinéraires indiqués, pas les raccourcis du GPS.</li><li>Garder le réservoir au moins à moitié plein en période de risque.</li></ol>"+
+ "<h3>Papiers à avoir en double (papier + clé USB / cloud)</h3><ul class='dots'><li>Pièces d'identité, permis, carte Vitale / carte européenne d'assurance maladie.</li><li>Contrats d'assurance (habitation, véhicule), titre de propriété ou bail.</li><li>Ordonnances, carnet de vaccination, documents de l'animal.</li><li>Liste de numéros importants écrite à la main.</li></ul>"},
+ {id:"food",ic:"🍲",t:"Nourriture et hygiène",k:"nourriture manger conserves hygiène toilettes déchets",b:
+ "<h3>Manger</h3><ul class='dots'><li>Consommer d'abord le frais, puis le congélateur, puis les conserves.</li><li>Stocks utiles : conserves (avec ouvre-boîte manuel), riz, pâtes, flocons d'avoine, lait UHT, fruits secs, barres, beurre de cacahuète, miel, chocolat.</li><li>Cuisiner dehors (réchaud) ; prévoir des aliments mangeables sans cuisson.</li><li>Faire tourner le stock : utiliser le plus ancien, racheter (méthode « premier entré, premier sorti »).</li></ul>"+
+ "<h3>Hygiène sans eau courante</h3><ul class='dots'><li>Lavage des mains : gel hydroalcoolique ou eau + savon, surtout avant de manger et après les toilettes.</li><li>Toilettes de secours : seau avec double sac poubelle, sciure, litière ou cendre après chaque usage, bien fermé.</li><li>Déchets : sacs fermés, à l'écart du logement.</li></ul>"}
+];
+var AID = [
+ {id:"call",ic:"📞",t:"Alerter les secours",k:"alerter appeler 15 112 18 message",b:
+ "<ol class='steps'><li>Composer le <b>15</b> (urgence médicale) ou le <b>112</b>. Sourd ou impossible de parler : SMS au <b>114</b>.</li><li>Dire : <b>qui</b> tu es et ton numéro, <b>où</b> exactement (commune, rue, n°, étage, code, point de repère, km de l'autoroute et sens), <b>quoi</b> (ce qui s'est passé), <b>combien</b> de victimes, <b>leur état</b> (conscience, respiration, saignement).</li><li>Dire ce que tu as déjà fait.</li><li><b>Ne pas raccrocher le premier</b> : l'opérateur peut te guider.</li><li>Envoyer quelqu'un accueillir les secours si possible.</li></ol><div class='infobox'>Outils → Position donne tes coordonnées GPS à lire à l'opérateur.</div>"},
+ {id:"cpr",ic:"❤️",t:"Arrêt cardiaque (massage)",k:"arrêt cardiaque massage cardiaque rcp défibrillateur dae inconscient ne respire pas",b:
+ "<p><b>La personne ne répond pas et ne respire pas</b> (ou respire de façon anormale, par à-coups) :</p><ol class='steps'><li><b>Appeler</b> le 15 / 112 (haut-parleur), faire chercher un <b>défibrillateur (DAE)</b>.</li><li>Allonger sur le dos, sur une surface dure. Mains l'une sur l'autre au <b>centre de la poitrine</b>.</li><li>Bras tendus, enfoncer de <b>5 à 6 cm</b>, au rythme de <b>100 à 120 par minute</b> (rythme de « Stayin' Alive »), en laissant la poitrine remonter complètement.</li><li>Si tu es formé : 30 compressions puis 2 insufflations. Sinon : <b>compressions en continu</b>, c'est déjà très efficace.</li><li>Dès que le DAE arrive : l'allumer et <b>suivre ses instructions vocales</b>. Il décide seul s'il faut choquer.</li><li>Ne pas arrêter avant l'arrivée des secours ou la reprise d'une respiration normale. Se relayer toutes les 2 minutes si possible.</li></ol>"+
+ "<button class='btn acc' onclick='metro.toggle()' id='metroBtn'>▶ Métronome 110/min</button>"+
+ "<div class='infobox'>Enfant / nourrisson : même principe, 15 compressions puis 2 insufflations si formé ; enfoncer d'un tiers de l'épaisseur du thorax (une main pour l'enfant, deux doigts pour le nourrisson).</div>"},
+ {id:"pls",ic:"🛌",t:"Inconscient qui respire (PLS)",k:"pls position latérale de sécurité inconscient respire",b:
+ "<ol class='steps'><li>Vérifier qu'elle respire : regarder le ventre/la poitrine se soulever, écouter et sentir le souffle pendant 10 secondes, tête basculée en arrière, menton tiré.</li><li>Mettre le bras le plus proche de toi à angle droit.</li><li>Prendre l'autre main, dos de la main contre la joue de la victime, et la maintenir.</li><li>Relever le genou opposé, puis faire rouler la victime vers toi d'un mouvement régulier.</li><li>Ajuster la jambe du dessus à angle droit, ouvrir la bouche (pour que les liquides s'écoulent).</li><li>Appeler le 15 / 112, couvrir, <b>vérifier la respiration en permanence</b>. Si elle s'arrête : massage cardiaque.</li></ol><div class='warnbox'>Suspicion de traumatisme du cou (chute, accident) et respiration normale : ne pas bouger sauf danger, maintenir la tête dans l'axe.</div>"},
+ {id:"bleed",ic:"🩸",t:"Hémorragie",k:"saignement hémorragie sang garrot plaie",b:
+ "<ol class='steps'><li>Se protéger si possible (gants, sac plastique).</li><li><b>Appuyer fort</b> directement sur la plaie avec la main ou un tissu propre plié, sans relâcher.</li><li>Allonger la victime. Appeler le 15 / 112.</li><li>Remplacer la main par un <b>pansement compressif</b> (tissu + bande serrée). Si ça traverse, rajouter par-dessus, ne pas retirer.</li><li>Si le saignement d'un bras ou d'une jambe ne s'arrête pas, ou si tu dois t'occuper d'autres victimes : <b>garrot</b> 5 à 7 cm au-dessus de la plaie (jamais sur une articulation), serrer jusqu'à l'arrêt du saignement, <b>noter l'heure</b>, ne jamais le desserrer soi-même.</li><li>Couvrir la victime, surveiller, la rassurer.</li></ol><div class='infobox'>Saignement du nez : tête penchée en avant, se moucher, comprimer les narines 10 minutes.</div>"},
+ {id:"choke",ic:"🫁",t:"Étouffement",k:"étouffement s'étouffe heimlich obstruction gorge",b:
+ "<p>La personne ne peut plus parler, tousser ni respirer, porte les mains à sa gorge :</p><ol class='steps'><li>La pencher en avant, donner jusqu'à <b>5 claques vigoureuses dans le dos</b>, entre les omoplates, avec le talon de la main.</li><li>Si ça ne marche pas : <b>5 compressions abdominales</b> (Heimlich). Debout derrière elle, poing au creux de l'estomac sous les côtes, l'autre main par-dessus, tirer fort vers toi et vers le haut.</li><li>Alterner 5 claques / 5 compressions jusqu'à ce que ça se débloque.</li><li>Si elle perd connaissance : appeler le 15 / 112, commencer le massage cardiaque.</li></ol><div class='infobox'>Femme enceinte ou personne obèse : compressions au milieu de la poitrine. Nourrisson : à plat ventre sur l'avant-bras, tête plus basse, 5 claques dans le dos, puis 5 compressions sur le sternum avec deux doigts.</div><p class='mut'>Si elle tousse encore : ne rien faire, l'encourager à tousser.</p>"},
+ {id:"burn",ic:"🔥",t:"Brûlure",k:"brûlure feu eau chaude chimique",b:
+ "<ol class='steps'><li><b>Refroidir</b> immédiatement sous l'eau tempérée (15 à 25 °C) pendant <b>20 minutes</b> si possible (au moins 10). Pas d'eau glacée, pas de glace.</li><li>Retirer bijoux et vêtements non collés à la peau.</li><li>Couvrir avec un film alimentaire ou un linge propre. Ne pas percer les cloques, ne mettre ni beurre, ni dentifrice, ni pommade grasse.</li><li>Appeler le 15 / 112 si : brûlure plus grande que la paume de la victime, cloques étendues, peau blanche ou noire, visage, mains, sexe, articulations, voies respiratoires, enfant ou personne âgée, brûlure électrique ou chimique.</li></ol><div class='infobox'>Brûlure chimique : rincer abondamment très longtemps (20 min et plus). Électrique : couper le courant avant de toucher la victime.</div>"},
+ {id:"frac",ic:"🦴",t:"Fracture, entorse, traumatisme",k:"fracture os cassé entorse foulure chute",b:
+ "<ol class='steps'><li>Ne pas bouger la partie blessée, ne pas essayer de remettre en place.</li><li>Immobiliser dans la position où on la trouve : écharpe pour le bras, attelle de fortune (carton, journal roulé, bâton) en prenant l'articulation au-dessus et au-dessous.</li><li>Froid enveloppé dans un tissu pour la douleur (20 min).</li><li>Fracture ouverte : couvrir la plaie d'un linge propre, ne pas toucher l'os.</li><li>Chute de hauteur, choc à la tête, douleur au cou ou au dos : ne pas déplacer, maintenir la tête dans l'axe, appeler le 15 / 112.</li></ol>"},
+ {id:"stroke",ic:"🧠",t:"AVC et malaise",k:"avc attaque cérébrale malaise crise cardiaque infarctus douleur poitrine",b:
+ "<h3>AVC : méthode VITE</h3><ul class='dots'><li><b>V</b>isage paralysé (sourire asymétrique)</li><li><b>I</b>nertie d'un membre (bras qui retombe)</li><li><b>T</b>rouble de la parole</li><li><b>E</b>n urgence : appeler le <b>15</b>, noter l'heure du début des signes</li></ul>"+
+ "<h3>Douleur dans la poitrine (infarctus possible)</h3><ol class='steps'><li>Mettre au repos, assis ou demi-assis.</li><li>Appeler le 15. Ne pas l'emmener soi-même à l'hôpital.</li><li>Demander s'il a un traitement prévu (ex. spray de trinitrine) et l'aider à le prendre selon l'ordonnance.</li></ol>"+
+ "<h3>Malaise</h3><ol class='steps'><li>Mettre au repos (allongé si la personne le souhaite).</li><li>Poser des questions : âge, maladies, traitements, déjà arrivé ?</li><li>Diabétique conscient qui fait un malaise : lui donner du sucre (jus de fruit, sucre).</li><li>Appeler le 15 et suivre ses conseils.</li></ol>"},
+ {id:"allergy",ic:"🐝",t:"Allergie grave",k:"allergie anaphylaxie piqûre guêpe abeille adrénaline gonflement",b:
+ "<p>Signes : gonflement du visage ou de la gorge, difficulté à respirer, plaques sur le corps, malaise, après un aliment, une piqûre ou un médicament.</p><ol class='steps'><li>Appeler le 15 / 112.</li><li>Si la personne a un <b>stylo d'adrénaline</b> : l'aider à l'utiliser sur la face extérieure de la cuisse (à travers le pantalon si besoin), selon la notice.</li><li>Gêne respiratoire : laisser assise. Malaise : allonger, jambes surélevées. Inconsciente qui respire : PLS.</li><li>Une deuxième injection peut être nécessaire au bout de 5 à 15 min si pas d'amélioration (selon l'avis du 15).</li></ol>"},
+ {id:"hypo",ic:"🥶",t:"Hypothermie",k:"hypothermie froid frissons",b:
+ "<ol class='steps'><li>Mettre à l'abri du froid et du vent, isoler du sol.</li><li>Retirer les vêtements mouillés, couvrir (couverture, couverture de survie), couvrir la tête.</li><li>Si consciente : boissons chaudes et sucrées, sans alcool.</li><li>Manipuler doucement, ne pas frictionner, ne pas faire marcher une personne très refroidie.</li><li>Confusion, somnolence, arrêt des frissons : appeler le 15 / 112, c'est grave.</li></ol>"},
+ {id:"poison",ic:"☠️",t:"Intoxication",k:"intoxication poison monoxyde produit ménager champignon médicament",b:
+ "<ol class='steps'><li><b>Monoxyde de carbone</b> (maux de tête, nausées, plusieurs personnes malades dans la même pièce) : ouvrir les fenêtres, sortir, appeler le 18 / 112.</li><li>Produit avalé : ne pas faire vomir, ne rien donner à boire, garder l'emballage.</li><li>Appeler le 15 ou un centre antipoison (France : numéro du centre régional, accessible via le 15).</li><li>Produit sur la peau ou dans les yeux : rincer à l'eau 15 minutes.</li></ol>"},
+ {id:"kitaid",ic:"🧰",t:"Trousse de secours",k:"trousse pharmacie secours contenu",b:
+ "<ul class='dots'><li>Gants jetables, masque.</li><li>Compresses stériles, pansements de tailles variées, bandes, sparadrap.</li><li>Pansement compressif d'urgence (type « israélien »), garrot tourniquet si formé.</li><li>Antiseptique non coloré, sérum physiologique en dosettes.</li><li>Ciseaux à bouts ronds, pince à épiler, tire-tique.</li><li>Couverture de survie, film alimentaire (brûlures).</li><li>Thermomètre, paracétamol, traitements personnels (au moins 7 jours d'avance).</li><li>Écharpe triangulaire, attelle souple.</li><li>Carnet + crayon pour noter heures et observations.</li></ul>"}
+];
+function renderList(arr, listId, q) {
+  q = (q || "").toLowerCase().trim();
+  var html = "";
+  for (var i = 0; i < arr.length; i++) {
+    var g = arr[i];
+    if (q && (g.t + " " + g.k).toLowerCase().indexOf(q) < 0) continue;
+    html += '<div class="it" data-id="' + g.id + '"><div class="ic">' + g.ic + '</div><div class="tt"><b>' + esc(g.t) + '</b></div><span class="mut">›</span></div>';
+  }
+  $(listId).innerHTML = html || '<div class="it mut">Aucun résultat</div>';
+}
+function openDetail(g) { $("dTitle").textContent = g.ic + " " + g.t; $("dBody").innerHTML = g.b; $("detail").classList.add("on"); $("detail").scrollTop = 0; }
+function closeDetail() { $("detail").classList.remove("on"); metro.stop(); }
+function bindList(arr, listId, inputId) {
+  $(listId).addEventListener("click", function (e) { var it = e.target.closest(".it[data-id]"); if (!it) return; for (var i = 0; i < arr.length; i++) if (arr[i].id === it.getAttribute("data-id")) openDetail(arr[i]); });
+  $(inputId).addEventListener("input", function () { renderList(arr, listId, this.value); });
+  renderList(arr, listId, "");
+}
+
+/* ---------- audio ---------- */
+var audio = {
+  ctx: null,
+  get: function () { if (!this.ctx) { var A = window.AudioContext || window.webkitAudioContext; if (A) this.ctx = new A(); } if (this.ctx && this.ctx.state === "suspended") this.ctx.resume(); return this.ctx; },
+  beep: function (start, dur, freq, type) {
+    var c = this.get(); if (!c) return null;
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || "sine"; o.frequency.value = freq || 800;
+    g.gain.setValueAtTime(0, start); g.gain.linearRampToValueAtTime(0.6, start + 0.01); g.gain.setValueAtTime(0.6, start + dur - 0.01); g.gain.linearRampToValueAtTime(0, start + dur);
+    o.connect(g); g.connect(c.destination); o.start(start); o.stop(start + dur + 0.02); return o;
+  }
+};
+
+/* ---------- overlay (lampe, sos, fiches) ---------- */
+var ovTimer = null, ovDimLvl = 0;
+function overlay(bg, fg, text) { var o = $("overlay"); o.style.background = bg; o.style.color = fg; $("ovText").innerHTML = text || ""; o.classList.add("on"); wake.lock(); try { if (o.requestFullscreen) o.requestFullscreen().catch(function () {}); } catch (e) {} }
+function overlayOff() { clearInterval(ovTimer); clearTimeout(ovTimer); ovTimer = null; morse.stop(); $("overlay").classList.remove("on"); $("overlay").style.overflow = ""; wake.release(); try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} }
+$("ovDim").addEventListener("click", function () { ovDimLvl = (ovDimLvl + 1) % 3; var cols = ["#ffffff", "#ff3b30", "#ffb000"]; if (!ovTimer) $("overlay").style.background = cols[ovDimLvl]; });
+var wake = { s: null, lock: function () { try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (s) { wake.s = s; }, function () {}); } catch (e) {} }, release: function () { try { if (wake.s) wake.s.release(); } catch (e) {} wake.s = null; } };
+var torch = { on: function () { ovDimLvl = 0; overlay("#ffffff", "#000", ""); $("ovDim").style.display = ""; } };
+var sos = { start: function () { $("ovDim").style.display = "none"; overlay("#000", "#fff", ""); morse.play(true, "SOS ", true); } };
+var strobe = { start: function () { $("ovDim").style.display = "none"; overlay("#000", "#fff", ""); var on = false; ovTimer = setInterval(function () { on = !on; $("overlay").style.background = on ? "#fff" : "#000"; }, 120); } };
+var whistle = { o: null, toggle: function () {
+  var c = audio.get(); if (!c) { toast("Audio indisponible"); return; }
+  if (this.o) { try { this.o.stop(); } catch (e) {} this.o = null; $("whLbl").textContent = "Sifflet"; return; }
+  var o = c.createOscillator(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+  o.type = "square"; o.frequency.value = 3100; l.frequency.value = 6; lg.gain.value = 250; l.connect(lg); lg.connect(o.frequency);
+  g.gain.value = 0.35; o.connect(g); g.connect(c.destination); o.start(); l.start(); this.o = o; this.l = l; var self = this;
+  o.onended = function () { try { self.l.stop(); } catch (e) {} };
+  $("whLbl").textContent = "Arrêter";
+} };
+
+/* ---------- morse ---------- */
+var MORSE = { A: ".-", B: "-...", C: "-.-.", D: "-..", E: ".", F: "..-.", G: "--.", H: "....", I: "..", J: ".---", K: "-.-", L: ".-..", M: "--", N: "-.", O: "---", P: ".--.", Q: "--.-", R: ".-.", S: "...", T: "-", U: "..-", V: "...-", W: ".--", X: "-..-", Y: "-.--", Z: "--..", "0": "-----", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.", ".": ".-.-.-", ",": "--..--", "?": "..--..", "/": "-..-.", "@": ".--.-." };
+function noAccent(s) { return s.normalize ? s.normalize("NFD").replace(/[̀-ͯ]/g, "") : s; }
+var morse = {
+  timers: [], loop: false,
+  encode: function (t) { var out = [], w = noAccent(t.toUpperCase()).split(/\s+/); for (var i = 0; i < w.length; i++) { var l = []; for (var j = 0; j < w[i].length; j++) if (MORSE[w[i][j]]) l.push(MORSE[w[i][j]]); if (l.length) out.push(l.join(" ")); } return out.join(" / "); },
+  render: function () { $("morseOut").textContent = this.encode($("morseIn").value).replace(/\./g, "·").replace(/-/g, "–"); },
+  stop: function () { for (var i = 0; i < this.timers.length; i++) clearTimeout(this.timers[i]); this.timers = []; this.loop = false; },
+  play: function (light, txt, loop) {
+    this.stop(); this.loop = !!loop;
+    txt = txt || $("morseIn").value; if (light && !$("overlay").classList.contains("on")) { $("ovDim").style.display = "none"; overlay("#000", "#fff", ""); }
+    var u = 200, t = 0, seq = [], words = noAccent(txt.toUpperCase()).split(/\s+/), i, j, k;
+    for (i = 0; i < words.length; i++) { if (!words[i]) continue; for (j = 0; j < words[i].length; j++) { var code = MORSE[words[i][j]]; if (!code) continue; for (k = 0; k < code.length; k++) { var d = code[k] === "." ? u : 3 * u; seq.push([t, d]); t += d + u; } t += 2 * u; } t += 4 * u; }
+    var c = light ? null : audio.get(), base = c ? c.currentTime + 0.05 : 0, self = this;
+    var ac = audio.get();
+    for (i = 0; i < seq.length; i++) {
+      (function (s) {
+        if (ac) audio.beep(ac.currentTime + 0.05 + s[0] / 1000, s[1] / 1000, 700);
+        if (light) { self.timers.push(setTimeout(function () { $("overlay").style.background = "#fff"; }, s[0])); self.timers.push(setTimeout(function () { $("overlay").style.background = "#000"; }, s[0] + s[1])); }
+      })(seq[i]);
+    }
+    if (this.loop) this.timers.push(setTimeout(function () { if (self.loop && $("overlay").classList.contains("on")) self.play(true, txt, true); }, t + 1000));
+  }
+};
+$("morseIn").addEventListener("input", function () { morse.render(); });
+(function () { var h = ""; for (var k in MORSE) if (/[A-Z0-9]/.test(k)) h += "<div><b style='color:var(--acc)'>" + k + "</b> " + MORSE[k].replace(/\./g, "·").replace(/-/g, "–") + "</div>"; $("morseTable").innerHTML = h; })();
+
+/* métronome RCP */
+var metro = { t: null, toggle: function () { if (this.t) { this.stop(); return; } var c = audio.get(); if (!c) return; this.t = setInterval(function () { audio.beep(audio.get().currentTime, 0.05, 1000); }, 545); var b = $("metroBtn"); if (b) b.textContent = "■ Arrêter le métronome"; }, stop: function () { clearInterval(this.t); this.t = null; var b = $("metroBtn"); if (b) b.textContent = "▶ Métronome 110/min"; } };
+/* sirène exemple */
+var siren = { o: null, toggle: function () {
+  var c = audio.get(); if (!c) return;
+  if (this.o) { try { this.o.stop(); } catch (e) {} this.o = null; $("sirenBtn").textContent = "▶ Écouter un exemple (15 s)"; return; }
+  var o = c.createOscillator(), g = c.createGain(), now = c.currentTime; o.type = "sawtooth"; g.gain.value = 0.15;
+  for (var i = 0; i < 4; i++) { o.frequency.setValueAtTime(350, now + i * 4); o.frequency.linearRampToValueAtTime(800, now + i * 4 + 2); o.frequency.linearRampToValueAtTime(350, now + i * 4 + 4); }
+  o.connect(g); g.connect(c.destination); o.start(now); o.stop(now + 15); this.o = o; var self = this;
+  o.onended = function () { self.o = null; $("sirenBtn").textContent = "▶ Écouter un exemple (15 s)"; };
+  $("sirenBtn").textContent = "■ Arrêter";
+} };
+
+/* ---------- GPS ---------- */
+function dms(v, pos, neg) { var a = Math.abs(v), d = Math.floor(a), m = Math.floor((a - d) * 60), s = ((a - d) * 60 - m) * 60; return d + "°" + m + "'" + s.toFixed(1) + '"' + (v >= 0 ? pos : neg); }
+var gps = { last: store.get("lastPos", null),
+  get: function (cb) {
+    if (!navigator.geolocation) { $("gpsOut").textContent = "Géolocalisation indisponible sur cet appareil."; return; }
+    $("gpsOut").textContent = "Recherche du signal…";
+    navigator.geolocation.getCurrentPosition(function (p) {
+      var c = p.coords; gps.last = { lat: c.latitude, lon: c.longitude, acc: Math.round(c.accuracy), alt: c.altitude, t: Date.now() }; store.set("lastPos", gps.last); gps.render(); if (cb) cb(gps.last);
+    }, function (err) { $("gpsOut").innerHTML = "Position indisponible (" + esc(err.message || err.code) + "). Vérifie : Réglages → Confidentialité → Service de localisation." + gps.lastHtml(); }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
+  },
+  txt: function (p) { return p.lat.toFixed(5) + ", " + p.lon.toFixed(5); },
+  lastHtml: function () { return gps.last ? "<p class='mut'>Dernière position connue (" + new Date(gps.last.t).toLocaleString("fr-FR") + ") : " + gps.txt(gps.last) + "</p>" : ""; },
+  render: function () {
+    var p = gps.last; if (!p) return; var dec = gps.txt(p);
+    var msg = "Ma position : " + dec + " (" + dms(p.lat, "N", "S") + " " + dms(p.lon, "E", "O") + ") précision " + p.acc + " m. https://maps.apple.com/?q=" + p.lat.toFixed(5) + "," + p.lon.toFixed(5);
+    $("gpsOut").innerHTML = "<div class='stat mono' style='font-size:22px'>" + dec + "</div><div class='mono'>" + dms(p.lat, "N", "S") + "  " + dms(p.lon, "E", "O") + "</div>" +
+      "<div class='mut'>Précision ± " + p.acc + " m" + (p.alt != null ? " · altitude " + Math.round(p.alt) + " m" : "") + " · " + new Date(p.t).toLocaleTimeString("fr-FR") + "</div>" +
+      "<div class='row' style='margin-top:10px;flex-wrap:wrap'><button class='btn sm' onclick='copyText(" + JSON.stringify(msg).replace(/'/g, "&#39;") + ")'>Copier</button>" +
+      "<a class='btn sm' href='sms:?&body=" + encodeURIComponent(msg) + "'>SMS</a>" +
+      "<a class='btn sm' href='https://maps.apple.com/?q=" + p.lat + "," + p.lon + "' target='_blank' rel='noopener'>Plans</a>" +
+      "<a class='btn sm' href='https://www.google.com/maps?q=" + p.lat + "," + p.lon + "' target='_blank' rel='noopener'>Google Maps</a></div>" +
+      "<p class='mut'>À lire aux secours : d'abord la latitude (" + p.lat.toFixed(5) + "), puis la longitude (" + p.lon.toFixed(5) + ").</p>";
+  }
+};
+
+/* ---------- boussole ---------- */
+var compass = {
+  started: false,
+  start: function () {
+    var self = this;
+    function go2() {
+      if (self.started) return; self.started = true;
+      var evt = "ondeviceorientationabsolute" in window ? "deviceorientationabsolute" : "deviceorientation";
+      window.addEventListener(evt, function (e) {
+        var h = null;
+        if (typeof e.webkitCompassHeading === "number") h = e.webkitCompassHeading;
+        else if (e.absolute && typeof e.alpha === "number") h = (360 - e.alpha) % 360;
+        else if (typeof e.alpha === "number") h = (360 - e.alpha) % 360;
+        if (h === null) return;
+        $("cmpSvg").style.transform = "rotate(" + (-h) + "deg)";
+        var dirs = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+        $("cmpDeg").textContent = Math.round(h) + "° " + dirs[Math.round(h / 45) % 8];
+        $("cmpTxt").textContent = "Le N orange indique le nord magnétique. Éloigne-toi des objets métalliques.";
+      }, true);
+      setTimeout(function () { if ($("cmpDeg").textContent.indexOf("–") === 0) $("cmpTxt").textContent = "Pas de capteur détecté sur cet appareil."; }, 3000);
+    }
+    try {
+      if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission().then(function (r) { if (r === "granted") go2(); else $("cmpTxt").textContent = "Autorisation refusée."; }, function () { $("cmpTxt").textContent = "Autorisation impossible ici. Ouvre l'appli installée."; });
+      } else if (window.DeviceOrientationEvent) go2(); else $("cmpTxt").textContent = "Boussole non disponible sur cet appareil.";
+    } catch (e) { $("cmpTxt").textContent = "Boussole non disponible."; }
+  }
+};
+
+/* ---------- fiche médicale ---------- */
+var MEDLBL = { name: "Nom", dob: "Né(e) le", blood: "Groupe sanguin", weight: "Poids (kg)", allergies: "ALLERGIES", meds: "Traitements", history: "Antécédents", doctor: "Médecin", ice1: "Prévenir", ice2: "Prévenir" };
+function bindFields(attr, key) {
+  var data = store.get(key, {}), els = document.querySelectorAll("[" + attr + "]");
+  for (var i = 0; i < els.length; i++) {
+    (function (el) { var f = el.getAttribute(attr); if (data[f] != null) el.value = data[f];
+      el.addEventListener("input", function () { var d = store.get(key, {}); d[f] = el.value; store.set(key, d); });
+      el.addEventListener("change", function () { var d = store.get(key, {}); d[f] = el.value; store.set(key, d); });
+    })(els[i]);
+  }
+}
+function fieldsText(key, lbl) { var d = store.get(key, {}), out = []; for (var k in lbl) if (d[k]) out.push(lbl[k] + " : " + d[k]); return out; }
+var med = {
+  show: function () { var lines = fieldsText("med", MEDLBL); $("ovDim").style.display = "none"; overlay("#fff", "#000", "<div style='text-align:left;font-size:19px;max-width:600px'><div style='color:#c00;font-size:26px'>⚕ FICHE MÉDICALE D'URGENCE</div>" + (lines.length ? lines.map(function (l) { return "<p style='margin:8px 0'>" + esc(l).replace(/\n/g, "<br>") + "</p>"; }).join("") : "<p>Fiche vide.</p>") + "</div>"); $("overlay").style.overflow = "auto"; },
+  copy: function () { copyText("FICHE MÉDICALE D'URGENCE\n" + fieldsText("med", MEDLBL).join("\n")); }
+};
+var PLANLBL = { rdv1: "RDV 1 (près domicile)", rdv2: "RDV 2 (hors quartier)", rdv3: "RDV 3 (hors ville)", relay: "Contact relais", contacts: "Contacts", school: "École / travail", radio: "Vacations radio", code: "Mots codes", freqs: "Fréquences radio" };
+var plan = { show: function () { var lines = fieldsText("plan", PLANLBL); $("ovDim").style.display = "none"; overlay("#fff", "#000", "<div style='text-align:left;font-size:18px;max-width:600px'><div style='font-size:24px'>👪 PLAN FAMILIAL</div>" + (lines.length ? lines.map(function (l) { return "<p style='margin:8px 0'>" + esc(l).replace(/\n/g, "<br>") + "</p>"; }).join("") : "<p>Plan vide.</p>") + "<button class='btn' style='margin-top:10px' onclick='copyText(" + JSON.stringify("PLAN FAMILIAL\n" + lines.join("\n")).replace(/'/g, "&#39;") + ")'>Copier le texte</button></div>"); $("overlay").style.overflow = "auto"; } };
+
+/* ---------- messages ---------- */
+var DEFMSG = [
+  { t: "Je vais bien", b: "Je vais bien. Je suis en sécurité à {POS}. Batterie limitée, je donnerai des nouvelles par SMS. Ne pas appeler sauf urgence." },
+  { t: "Besoin d'aide", b: "J'AI BESOIN D'AIDE. Position : {POS}. Je ne suis pas blessé(e) / je suis blessé(e) (rayer). Merci d'alerter le 112 si tu n'as pas de nouvelles dans 2 h." },
+  { t: "Évacuation", b: "Nous évacuons. Destination : ____. Point de RDV prévu. Position actuelle : {POS}." },
+  { t: "Bloqué sur la route", b: "Je suis bloqué(e) sur la route (neige / accident / fermeture). Position : {POS}. J'ai eau, nourriture et chauffage pour __ h." },
+  { t: "Message au relais", b: "Point de situation : tout le monde va bien sauf ____. Nous sommes à {POS}. Prochain message à __ h." }
+];
+var msgs = {
+  list: function () { return store.get("msgs", DEFMSG); },
+  render: function () {
+    var l = this.list(), h = "";
+    for (var i = 0; i < l.length; i++) {
+      h += "<div class='card'><div class='row'><b style='flex:1'>" + esc(l[i].t) + "</b><button class='btn sm' style='flex:0 0 auto' onclick='msgs.del(" + i + ")'>✕</button></div><p style='margin:8px 0'>" + esc(l[i].b) + "</p><div class='row'><button class='btn sm' onclick='msgs.copy(" + i + ")'>Copier</button><a class='btn sm' href='#' onclick='return msgs.sms(" + i + ")'>Envoyer par SMS</a></div></div>";
+    }
+    $("msgList").innerHTML = h;
+  },
+  text: function (i) { var p = $("msgPos").value || "(position inconnue)"; return this.list()[i].b.replace(/\{POS\}/g, p); },
+  copy: function (i) { copyText(this.text(i)); },
+  sms: function (i) { location.href = "sms:?&body=" + encodeURIComponent(this.text(i)); return false; },
+  del: function (i) { var l = this.list(); l.splice(i, 1); store.set("msgs", l); this.render(); },
+  add: function () { var t = $("msgNewT").value.trim(), b = $("msgNewB").value.trim(); if (!t || !b) { toast("Titre et texte requis"); return; } var l = this.list(); l.push({ t: t, b: b }); store.set("msgs", l); $("msgNewT").value = ""; $("msgNewB").value = ""; this.render(); },
+  fillPos: function () { if (gps.last && Date.now() - gps.last.t < 600000) { $("msgPos").value = gps.txt(gps.last); return; } $("msgPos").value = "recherche…"; gps.get(function (p) { $("msgPos").value = gps.txt(p); }); setTimeout(function () { if ($("msgPos").value === "recherche…") $("msgPos").value = gps.last ? gps.txt(gps.last) : ""; }, 31000); }
+};
+
+/* ---------- PMR ---------- */
+(function () { var h = ""; for (var i = 0; i < 8; i++) { var a = (446.00625 + i * 0.0125).toFixed(5), b = (446.00625 + (i + 8) * 0.0125).toFixed(5); h += "<tr><td>" + (i + 1) + "</td><td class='mono'>" + a + "</td><td>" + (i + 9) + "</td><td class='mono'>" + b + "</td></tr>"; } $("pmrTable").insertAdjacentHTML("beforeend", h); })();
+
+/* ---------- sac 72h ---------- */
+var DEFBAG = ["Eau : 6 L par personne (bouteilles)", "Nourriture sans cuisson pour 3 jours (barres, conserves, fruits secs)", "Ouvre-boîte manuel, couverts", "Radio à piles ou à dynamo", "Lampe frontale + piles de rechange", "Batterie externe chargée + câbles", "Trousse de secours", "Médicaments personnels (7 jours) + copies d'ordonnances", "Copies des papiers (identité, assurance, carte Vitale) + clé USB", "Argent liquide en petites coupures", "Double des clés (maison, voiture)", "Couverture de survie (x2)", "Vêtements chauds, imperméable, chaussures de marche", "Sifflet", "Couteau multifonction", "Briquet + allumettes tempête", "Pastilles de purification d'eau ou filtre", "Masques, gel hydroalcoolique, papier toilette", "Sacs poubelle, ruban adhésif, ficelle", "Carte routière papier de la région", "Bloc-notes + crayon, liste des numéros importants", "Lunettes de rechange", "Jeu de cartes / livre (pour les enfants)", "Nourriture, laisse et papiers de l'animal"];
+var bag = {
+  get: function () { return store.get("bag", DEFBAG.map(function (t) { return { t: t, d: false }; })); },
+  save: function (b) { store.set("bag", b); this.render(); renderHome(); },
+  render: function () {
+    var b = this.get(), h = "<div class='card' style='padding:4px 12px'>", done = 0;
+    for (var i = 0; i < b.length; i++) { if (b[i].d) done++; h += "<div class='chk" + (b[i].d ? " done" : "") + "'><input type='checkbox' " + (b[i].d ? "checked" : "") + " onchange='bag.tog(" + i + ")'><span>" + esc(b[i].t) + "</span><button class='x' onclick='bag.del(" + i + ")'>✕</button></div>"; }
+    $("bagList").innerHTML = h + "</div>";
+    var pct = b.length ? Math.round(done * 100 / b.length) : 0; $("bagPct").textContent = pct + " %"; $("bagBar").style.width = pct + "%";
+  },
+  tog: function (i) { var b = this.get(); b[i].d = !b[i].d; this.save(b); },
+  del: function (i) { var b = this.get(); b.splice(i, 1); this.save(b); },
+  add: function () { var t = $("bagNew").value.trim(); if (!t) return; var b = this.get(); b.push({ t: t, d: false }); $("bagNew").value = ""; this.save(b); },
+  reset: function () { var b = this.get(); for (var i = 0; i < b.length; i++) b[i].d = false; this.save(b); },
+  restore: function () { var b = this.get(), have = {}, i; for (i = 0; i < b.length; i++) have[b[i].t] = 1; for (i = 0; i < DEFBAG.length; i++) if (!have[DEFBAG[i]]) b.push({ t: DEFBAG[i], d: false }); this.save(b); toast("Éléments par défaut ajoutés"); }
+};
+
+/* ---------- stocks ---------- */
+var CATS = { eau: "💧", food: "🥫", med: "💊", energy: "🔋", other: "🧰" };
+var UNITLBL = { eau: "Litres par unité", food: "kcal par unité", med: "—", energy: "—", other: "—" };
+function updUnitLbl() { var c = $("stCat").value; $("stUnitLbl").textContent = UNITLBL[c]; $("stUnit").disabled = (c !== "eau" && c !== "food"); if (c === "food" && $("stUnit").value === "1.5") $("stUnit").value = "400"; if (c === "eau" && $("stUnit").value === "400") $("stUnit").value = "1.5"; }
+$("stCat").addEventListener("change", updUnitLbl);
+var stock = {
+  get: function () { return store.get("stock", []); },
+  save: function (s) { store.set("stock", s); this.render(); renderHome(); renderHH(); },
+  add: function () {
+    var n = $("stName").value.trim(), c = $("stCat").value, q = parseFloat($("stQty").value) || 0, u = parseFloat($("stUnit").value) || 0;
+    if (!n) { toast("Nom de l'article requis"); return; }
+    var s = this.get(); s.push({ n: n, c: c, q: q, u: (c === "eau" || c === "food") ? u : 0, e: $("stExp").value, id: Date.now() });
+    $("stName").value = ""; $("stQty").value = 1; $("stExp").value = ""; this.save(s); toast("Ajouté");
+  },
+  qty: function (id, d) { var s = this.get(); for (var i = 0; i < s.length; i++) if (s[i].id === id) { s[i].q = Math.max(0, Math.round((s[i].q + d) * 100) / 100); } this.save(s); },
+  del: function (id) { this.save(this.get().filter(function (x) { return x.id !== id; })); },
+  render: function () {
+    var s = this.get().slice().sort(function (a, b) { return (a.e || "9999") < (b.e || "9999") ? -1 : 1; });
+    if (!s.length) { $("stList").innerHTML = "<p class='mut'>Aucun stock enregistré. Commence par l'eau.</p>"; return; }
+    var h = "<div class='card' style='padding:4px 12px'>";
+    for (var i = 0; i < s.length; i++) {
+      var x = s[i], d = daysUntil(x.e), pill = "";
+      if (d !== null) pill = d < 0 ? "<span class='pill r'>périmé</span>" : d <= 30 ? "<span class='pill w'>" + d + " j</span>" : "<span class='pill'>" + x.e.split("-").reverse().join("/") + "</span>";
+      var sub = x.c === "eau" ? (Math.round(x.q * x.u * 10) / 10) + " L" : x.c === "food" ? Math.round(x.q * x.u) + " kcal" : "";
+      h += "<div class='chk'><span style='font-size:20px'>" + CATS[x.c] + "</span><span style='flex:1'><b>" + esc(x.n) + "</b><br><span class='mut'>× " + x.q + (sub ? " · " + sub : "") + "</span> " + pill + "</span>" +
+        "<button class='btn sm' onclick='stock.qty(" + x.id + ",-1)'>−</button><button class='btn sm' onclick='stock.qty(" + x.id + ",1)'>+</button><button class='x' onclick='stock.del(" + x.id + ")'>✕</button></div>";
+    }
+    $("stList").innerHTML = h + "</div>";
+  }
+};
+
+/* ---------- foyer / autonomie ---------- */
+var HHDEF = { adults: 1, kids: 0, pets: 1, water: 3, kcal: 2000, petWater: 1, target: 3 };
+function hh() { var h = store.get("hh", {}), o = {}; for (var k in HHDEF) o[k] = h[k] != null && h[k] !== "" ? +h[k] : HHDEF[k]; return o; }
+function autonomy() {
+  var h = hh(), s = stock.get(), L = 0, K = 0;
+  for (var i = 0; i < s.length; i++) { var d = daysUntil(s[i].e); if (d !== null && d < 0) continue; if (s[i].c === "eau") L += s[i].q * s[i].u; if (s[i].c === "food") K += s[i].q * s[i].u; }
+  var wNeed = (h.adults + h.kids) * h.water + h.pets * h.petWater, kNeed = (h.adults + h.kids * 0.6) * h.kcal;
+  return { L: L, K: K, wNeed: wNeed, kNeed: kNeed, wDays: wNeed ? L / wNeed : 0, kDays: kNeed ? K / kNeed : 0, target: h.target };
+}
+function fmtDays(d) { return d >= 10 ? Math.round(d) + " j" : (Math.round(d * 10) / 10).toString().replace(".", ",") + " j"; }
+function renderHH() {
+  var a = autonomy();
+  function line(lbl, days, have, need, unit) { var pct = Math.min(100, a.target ? days * 100 / a.target : 0), col = days >= a.target ? "var(--ok)" : days >= a.target / 2 ? "var(--warn)" : "var(--red)"; return "<div style='margin-bottom:10px'><div class='row'><b style='flex:1'>" + lbl + "</b><span style='color:" + col + ";font-weight:700'>" + fmtDays(days) + "</span></div><div class='bar'><i style='width:" + pct + "%;background:" + col + "'></i></div><div class='mut'>" + Math.round(have) + " " + unit + " en stock · besoin " + Math.round(need) + " " + unit + "/jour · manque " + Math.max(0, Math.round(need * a.target - have)) + " " + unit + " pour " + a.target + " j</div></div>"; }
+  $("hhResult").innerHTML = "<b>Autonomie actuelle</b><div style='margin-top:10px'>" + line("💧 Eau", a.wDays, a.L, a.wNeed, "L") + line("🥫 Nourriture", a.kDays, a.K, a.kNeed, "kcal") + "</div><p class='mut'>Les articles périmés ne sont pas comptés.</p>";
+}
+(function () { var map = { hhAdults: "adults", hhKids: "kids", hhPets: "pets", hhWater: "water", hhKcal: "kcal", hhPetWater: "petWater", hhTarget: "target" }, h = hh();
+  for (var id in map) (function (id, k) { $(id).value = h[k]; $(id).addEventListener("input", function () { var d = store.get("hh", {}); d[k] = this.value; store.set("hh", d); renderHH(); renderHome(); }); })(id, map[id]); })();
+
+/* ---------- accueil ---------- */
+function renderHome() {
+  var a = autonomy();
+  $("hWater").textContent = fmtDays(a.wDays); $("hWaterSub").textContent = Math.round(a.L) + " L en stock";
+  $("hFood").textContent = fmtDays(a.kDays); $("hFoodSub").textContent = Math.round(a.K).toLocaleString("fr-FR") + " kcal en stock";
+  $("hFood").style.color = a.kDays >= a.target ? "var(--ok)" : "var(--warn)"; $("hWater").style.color = a.wDays >= a.target ? "var(--ok)" : "var(--warn)";
+  var b = bag.get(), done = 0, i; for (i = 0; i < b.length; i++) if (b[i].d) done++;
+  var pct = b.length ? Math.round(done * 100 / b.length) : 0; $("hKitPct").textContent = pct + " %"; $("hKitBar").style.width = pct + "%";
+  var s = stock.get(), al = [];
+  for (i = 0; i < s.length; i++) { var d = daysUntil(s[i].e); if (d !== null && d <= 30) al.push((d < 0 ? "⛔ Périmé : " : "⚠️ Périme dans " + d + " j : ") + s[i].n); }
+  var lastBk = store.get("lastBackup", null); if (!lastBk || Date.now() - lastBk > 30 * 86400000) al.push("💾 Pas de sauvegarde depuis plus de 30 jours");
+  if (typeof ppe !== "undefined" && ppe.alerts) ppe.alerts(al); if (typeof seq !== "undefined" && seq.alerts) seq.alerts(al); if (typeof survEq !== "undefined" && survEq.alerts) survEq.alerts(al);
+  var m = store.get("med", {}); if (!m.name) al.push("🩺 Fiche médicale à remplir");
+  $("hAlerts").innerHTML = al.map(function (x) { return "<div class='mut' style='margin-top:4px'>" + esc(x) + "</div>"; }).join("");
+}
+
+/* ---------- sauvegarde ---------- */
+var BKEYS = ["bag", "stock", "hh", "med", "plan", "msgs", "country", "places", "risk", "neigh", "ppe", "seq", "surv", "bad", "energy", "survEq"];
+var backup = {
+  data: function () { var o = { app: "codex-survie", v: 1, date: new Date().toISOString() }; for (var i = 0; i < BKEYS.length; i++) o[BKEYS[i]] = store.get(BKEYS[i], null); return JSON.stringify(o); },
+  done: function () { store.set("lastBackup", Date.now()); renderHome(); },
+  download: function () {
+    try { var blob = new Blob([this.data()], { type: "application/json" }), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "codex-survie-" + todayStr() + ".json"; document.body.appendChild(a); a.click(); setTimeout(function () { document.body.removeChild(a); }, 500); this.done(); $("bkMsg").textContent = "Fichier créé. Si rien ne se passe, utilise « Copier le texte »."; } catch (e) { $("bkMsg").textContent = "Téléchargement impossible ici : utilise « Copier le texte »."; }
+  },
+  copy: function () { copyText(this.data()); this.done(); },
+  apply: function (txt) {
+    try { var o = JSON.parse(txt); if (o.app !== "codex-survie") throw new Error("format"); for (var i = 0; i < BKEYS.length; i++) if (o[BKEYS[i]] != null) store.set(BKEYS[i], o[BKEYS[i]]); $("bkMsg").textContent = "Restauration réussie (sauvegarde du " + new Date(o.date).toLocaleDateString("fr-FR") + "). Rechargement…"; setTimeout(function () { location.reload(); }, 900); }
+    catch (e) { $("bkMsg").textContent = "Texte de sauvegarde invalide."; }
+  },
+  restoreText: function () { this.apply($("bkText").value); }
+};
+$("bkFile").addEventListener("change", function () { var f = this.files[0]; if (!f) return; var r = new FileReader(); r.onload = function () { backup.apply(r.result); }; r.readAsText(f); });
+
+/* ---------- sécurité personnelle ---------- */
+var SECG = [
+ {id:"aware",ic:"👀",t:"Rester vigilant au quotidien",k:"vigilance attention situation repérer sorties",b:
+ "<ul class='dots'><li><b>Lever les yeux du téléphone</b> dans la rue, les parkings, les transports, surtout avec des écouteurs.</li><li>En entrant dans un lieu (gare, magasin, salle, aire d'autoroute), <b>repérer deux sorties</b>.</li><li>Faire confiance à son malaise : si une situation ou une personne te met mal à l'aise, change de trottoir, entre dans un commerce, fais demi-tour. Pas besoin de justifier.</li><li>Varier ses trajets et horaires si tu te sens suivi ou surveillé.</li><li>Garder clés et téléphone à portée de main, pas au fond du sac.</li><li>Ne pas afficher sa position en direct ni ses absences sur les réseaux sociaux.</li></ul>"},
+ {id:"aggr",ic:"✋",t:"Face à une agression",k:"agression vol racket menace violence rue",b:
+ "<ol class='steps'><li><b>Les biens ne valent pas ta vie</b> : en cas de vol avec menace ou arme, donner ce qui est demandé, sans gestes brusques.</li><li><b>Désamorcer</b> : voix calme, mains visibles et ouvertes, garder de la distance, ne pas répondre aux provocations.</li><li><b>Fuir dès que possible</b> vers un lieu fréquenté et éclairé (commerce, station-service, hôtel).</li><li><b>Faire du bruit</b> si on t'attaque : crier « Au secours », « Appelez la police », sifflet, alarme. Ça attire l'attention et fait souvent fuir l'agresseur.</li><li><b>Alerter</b> : 17 ou 112 dès que tu es en sécurité. Noter tout de suite : description (taille, vêtements, signes particuliers), direction de fuite, véhicule, plaque.</li><li>Porter plainte, même pour un vol simple ; faire constater les blessures par un médecin.</li></ol><div class='infobox'>Si tu es témoin : appeler le 17 / 112, observer à distance, porter assistance à la victime une fois le danger écarté. Ne pas s'exposer inutilement.</div><p class='mut'>Victime ou témoin de violences conjugales ou intrafamiliales en France : 3919 (écoute, gratuit, anonyme) ; danger immédiat : 17 ou SMS au 114.</p>"},
+ {id:"attack",ic:"🏃",t:"Attaque / tuerie de masse",k:"attentat attaque terroriste tireur tuerie fuir cacher",b:
+ "<p>Consigne officielle française : <b>s'échapper, se cacher, alerter</b>.</p><ol class='steps'><li><b>S'échapper</b> si c'est possible sans danger : localiser l'origine du danger, partir à l'opposé, aider les autres à fuir sans les attendre, laisser ses affaires, dissuader les gens d'entrer dans la zone.</li><li><b>Se cacher</b> si la fuite est impossible : s'enfermer, barricader la porte avec des meubles, éteindre lumières et sons, <b>mettre le téléphone en silencieux sans vibreur</b>, s'éloigner des portes et fenêtres, s'allonger derrière un obstacle solide, rester silencieux.</li><li><b>Alerter</b> quand tu es en sécurité : 17 ou 112 (ou SMS au 114 si parler est dangereux). Donner le lieu exact, le nombre et la description des assaillants, les armes vues.</li><li>À l'arrivée des forces de l'ordre : <b>mains levées et ouvertes</b>, pas de geste brusque, ne pas courir vers elles, suivre leurs ordres.</li></ol><p class='mut'>Ne pas diffuser d'images ou d'informations sur les réseaux pendant l'intervention : cela peut renseigner les assaillants.</p>"},
+ {id:"home",ic:"🏠",t:"Sécuriser le domicile",k:"maison domicile cambriolage serrure alarme vacances",b:
+ "<ul class='dots'><li>Fermer à clé même pour une courte absence, fenêtres comprises (y compris à l'étage, accessibles par un toit ou un arbre).</li><li>Porte avec serrure multipoints et cylindre de bonne qualité ; ne jamais laisser de clé « cachée » dehors.</li><li>Éclairage extérieur à détecteur, haies taillées près des ouvertures.</li><li>Ne pas laisser d'échelle ou d'outils dehors, ni les clés de voiture près de l'entrée.</li><li>Absence longue : simuler une présence (programmateur), faire relever le courrier, et en France s'inscrire à l'<b>Opération Tranquillité Vacances</b> (gratuit, auprès du commissariat ou de la gendarmerie, aussi en ligne) : des patrouilles passent devant ton domicile.</li><li>Photographier les objets de valeur et noter les numéros de série (utile pour la plainte et l'assurance).</li><li>Détecteur de fumée (obligatoire en France) et détecteur de monoxyde de carbone si chauffage à combustion.</li></ul><div class='warnbox'>Si tu trouves des traces d'effraction en rentrant : ne pas entrer (le cambrioleur peut être encore là), ne rien toucher, appeler le 17.</div>"},
+ {id:"door",ic:"🚪",t:"Démarchage et faux agents",k:"démarchage faux policier faux agent arnaque porte personnes âgées",b:
+ "<ol class='steps'><li>Utiliser le judas ou l'entrebâilleur, ne pas ouvrir à un inconnu.</li><li>Faux policier, faux agent EDF, eau, gaz, mairie : <b>demander la carte professionnelle</b>, puis <b>rappeler soi-même</b> l'organisme avec le numéro de ta facture ou de l'annuaire (jamais celui qu'il te donne). Un vrai agent attendra.</li><li>Ne jamais remettre d'argent, de bijoux, de carte bancaire ni de code, même « pour les mettre en sécurité » : aucun policier ne le demande.</li><li>Ne pas laisser la personne seule dans une pièce.</li><li>En cas de doute : 17. Prévenir les voisins âgés de ces techniques.</li></ol>"},
+ {id:"scam",ic:"📱",t:"Arnaques par téléphone et Internet",k:"arnaque phishing hameçonnage sms faux conseiller bancaire piratage",b:
+ "<ul class='dots'><li><b>Ta banque ne te demandera jamais</b> un code reçu par SMS, ton code secret ou de valider une opération « pour l'annuler ». Raccroche et rappelle le numéro au dos de ta carte.</li><li>SMS de colis, amende, Ameli, impôts avec un lien : ne pas cliquer. Aller sur le site officiel en tapant l'adresse soi-même.</li><li>Message d'un proche « j'ai changé de numéro, j'ai besoin d'argent » : appeler l'ancien numéro ou poser une question que seul lui connaît.</li><li>Activer la double authentification sur la messagerie, la banque et les réseaux sociaux. Un mot de passe différent par compte (gestionnaire de mots de passe).</li><li>Mettre à jour iPhone et Mac.</li><li>Victime : faire opposition (France : 0 892 705 705), changer les mots de passe, porter plainte ; signaler sur <b>cybermalveillance.gouv.fr</b> et les SMS frauduleux au <b>33700</b>.</li></ul>"},
+ {id:"truck",ic:"🚛",t:"Sécurité en camion et sur les aires",k:"camion poids lourd routier parking aire vol fret bâche cabine nuit",b:
+ "<ul class='dots'><li><b>Choisir son parking</b> : aires sécurisées (labels ESPORG / TAPA PSR, parkings clôturés et surveillés) plutôt que bord de route ou zone isolée, surtout avec une marchandise de valeur. Planifier l'arrêt avant d'être à court de temps de conduite.</li><li>Se garer de façon à <b>ne pas être bloqué</b> et à pouvoir repartir en marche avant ; portes arrière contre un mur ou un autre véhicule si possible.</li><li>Nuit : <b>portes verrouillées</b>, sangle ou barre de sécurité entre les poignées de cabine, rideaux fermés, clés et téléphone à portée.</li><li>Ne pas parler de sa marchandise ni de sa destination à la radio, à l'aire ou au restaurant.</li><li>Faire le tour du véhicule avant de repartir : <b>bâche, sangles, plombs/scellés, chargement, pneus</b>. Noter les numéros de scellés.</li><li>Ne pas s'arrêter pour une personne qui fait signe sur une voie rapide ou un faux « accident » isolé : continuer jusqu'à un lieu sûr et appeler le 112.</li><li>Contrôle par des personnes non identifiables (véhicule banalisé, pas d'uniforme) : rester verrouillé, demander à voir la carte à travers la vitre, appeler le 112 pour vérifier.</li><li>Agression ou vol : ne pas résister, alerter le 112, prévenir le donneur d'ordre et l'assurance, porter plainte dans le pays.</li></ul>"},
+ {id:"car",ic:"🚗",t:"En voiture",k:"voiture conduite vol car-jacking stationnement",b:
+ "<ul class='dots'><li>Verrouiller les portières en roulant en ville et aux feux ; sac et téléphone hors de vue (pas sur le siège passager).</li><li>Stationner dans des endroits éclairés et fréquentés ; avoir sa clé en main en approchant du véhicule.</li><li>Accrochage suspect dans un lieu isolé : rester dans le véhicule verrouillé, rouler jusqu'à un lieu fréquenté (commissariat, station-service) avant de faire le constat.</li><li>Car-jacking : donner les clés, s'éloigner, ne pas poursuivre. Ta sécurité d'abord.</li><li>Ne rien laisser de visible dans l'habitacle, même vide (sacs, câbles de chargeur).</li></ul>"},
+ {id:"travel",ic:"🧳",t:"En déplacement / à l'étranger",k:"voyage étranger hôtel papiers ambassade",b:
+ "<ul class='dots'><li>Copie numérique et papier des papiers d'identité, du permis et de la carte européenne d'assurance maladie, rangée séparément des originaux.</li><li>Français à l'étranger : s'inscrire sur <b>Ariane</b> (diplomatie.gouv.fr) pour recevoir les alertes et être contacté en cas de crise ; consulter les « Conseils aux voyageurs ».</li><li>Noter l'adresse et le téléphone de l'ambassade ou du consulat.</li><li>Hôtel : chambre de préférence entre le 2e et le 6e étage (hors d'atteinte depuis la rue mais accessible aux échelles des pompiers), repérer l'issue de secours, verrouiller la porte.</li><li>Un peu d'argent liquide dans une autre poche que le portefeuille.</li></ul>"},
+ {id:"kids",ic:"🧒",t:"Enfants et personnes vulnérables",k:"enfant perdu disparition personne âgée vulnérable",b:
+ "<ul class='dots'><li>Apprendre aux enfants leur nom, l'adresse et un numéro de téléphone par cœur, ainsi que le 112.</li><li>Convenir d'un point de rendez-vous dans les lieux très fréquentés (et de quoi faire s'ils sont perdus : s'adresser à un agent, une caissière, un parent avec enfants).</li><li>Prendre une photo de l'enfant le jour même lors d'une sortie dans la foule (tenue du jour).</li><li><b>Enfant disparu</b> : chercher immédiatement autour, prévenir le personnel du lieu, appeler le 17 / 112 sans attendre. En France, le 116 000 (Enfants disparus) accompagne les familles.</li><li>Personne âgée ou isolée du voisinage : prendre des nouvelles en cas de canicule, grand froid ou coupure.</li></ul>"}
+];
+
+/* ---------- autour de moi ---------- */
+var PLTYPES = [["hosp","🏥","Hôpital / urgences"],["pharma","💊","Pharmacie"],["dae","❤️","Défibrillateur (DAE)"],["police","👮","Police / gendarmerie"],["fire","🚒","Pompiers / centre de secours"],["mairie","🏛️","Mairie / lieu d'accueil"],["water","🚰","Point d'eau potable"],["fuel","⛽","Station-service"],["food","🛒","Commerce alimentaire"],["shelter","🏢","Abri / point haut / refuge"],["vet","🐾","Vétérinaire"],["parking","🅿️","Parking sécurisé PL"],["other","📌","Autre"]];
+function pltype(k) { for (var i = 0; i < PLTYPES.length; i++) if (PLTYPES[i][0] === k) return PLTYPES[i]; return PLTYPES[PLTYPES.length - 1]; }
+var NEAR = [["urgences","🏥 Urgences"],["pharmacie","💊 Pharmacie"],["défibrillateur","❤️ DAE"],["gendarmerie","👮 Gendarmerie"],["commissariat","👮 Commissariat"],["caserne pompiers","🚒 Pompiers"],["station-service","⛽ Carburant"],["supermarché","🛒 Supermarché"],["vétérinaire","🐾 Vétérinaire"],["parking poids lourds sécurisé","🅿️ Parking PL"]];
+var places = {
+  pos: null,
+  get: function () { return store.get("places", []); },
+  save: function (l) { store.set("places", l); this.render(); },
+  here: function () { var self = this; $("plPos").textContent = "Recherche de la position…"; gps.get(function (p) { self.pos = { lat: p.lat, lon: p.lon }; $("plPos").textContent = "Position enregistrée pour ce lieu : " + gps.txt(p); }); },
+  add: function () {
+    var n = $("plName").value.trim(); if (!n) { toast("Nom requis"); return; }
+    var l = this.get(); l.push({ id: Date.now(), ty: $("plType").value, n: n, a: $("plAddr").value.trim(), d: $("plDist").value.trim(), no: $("plNote").value.trim(), p: this.pos });
+    this.pos = null; $("plPos").textContent = ""; ["plName", "plAddr", "plDist", "plNote"].forEach(function (i) { $(i).value = ""; }); this.save(l); toast("Lieu ajouté");
+  },
+  del: function (id) { this.save(this.get().filter(function (x) { return x.id !== id; })); },
+  render: function () {
+    var l = this.get().slice().sort(function (a, b) { return a.ty < b.ty ? -1 : 1; }), h = "", have = {};
+    for (var i = 0; i < l.length; i++) {
+      var x = l[i], t = pltype(x.ty); have[x.ty] = 1;
+      var q = x.p ? x.p.lat + "," + x.p.lon : encodeURIComponent((x.n + " " + (x.a || "")).trim());
+      h += "<div class='card'><div class='row'><span style='flex:0 0 auto;font-size:24px'>" + t[1] + "</span><div style='flex:1'><b>" + esc(x.n) + "</b><div class='mut'>" + esc(t[2]) + (x.d ? " · " + esc(x.d) : "") + "</div></div><button class='btn sm' style='flex:0 0 auto' onclick='places.del(" + x.id + ")'>✕</button></div>" +
+        (x.a ? "<div style='margin-top:6px'>" + esc(x.a) + "</div>" : "") + (x.no ? "<div class='mut'>" + esc(x.no) + "</div>" : "") + (x.p ? "<div class='mono mut'>" + x.p.lat.toFixed(5) + ", " + x.p.lon.toFixed(5) + "</div>" : "") +
+        "<div class='row' style='margin-top:8px'><a class='btn sm' href='https://maps.apple.com/?" + (x.p ? "daddr=" : "q=") + q + "' target='_blank' rel='noopener'>Itinéraire (Plans)</a>" + (x.p ? "<button class='btn sm' onclick='places.dist(" + x.id + ")'>Distance</button>" : "") + "</div><div class='mut' id='pd" + x.id + "'></div></div>";
+    }
+    $("plList").innerHTML = h || "<p class='mut'>Aucun lieu enregistré.</p>";
+    var todo = ["hosp", "pharma", "dae", "police", "water", "shelter"].filter(function (k) { return !have[k]; }).map(function (k) { var t = pltype(k); return t[1] + " " + t[2]; });
+    $("plTodo").innerHTML = todo.length ? todo.join("<br>") : "✅ Les lieux essentiels sont repérés.";
+  },
+  dist: function (id) {
+    var x = this.get().filter(function (p) { return p.id === id; })[0]; if (!x || !x.p) return;
+    gps.get(function (p) { var R = 6371, toR = Math.PI / 180, dLa = (x.p.lat - p.lat) * toR, dLo = (x.p.lon - p.lon) * toR, a = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(p.lat * toR) * Math.cos(x.p.lat * toR) * Math.sin(dLo / 2) * Math.sin(dLo / 2), d = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), y = Math.sin(dLo) * Math.cos(x.p.lat * toR), xx = Math.cos(p.lat * toR) * Math.sin(x.p.lat * toR) - Math.sin(p.lat * toR) * Math.cos(x.p.lat * toR) * Math.cos(dLo), br = (Math.atan2(y, xx) / toR + 360) % 360, dirs = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+      $("pd" + id).textContent = "À vol d'oiseau : " + (d < 1 ? Math.round(d * 1000) + " m" : d.toFixed(1).replace(".", ",") + " km") + ", direction " + dirs[Math.round(br / 45) % 8] + " (" + Math.round(br) + "°)."; });
+  }
+};
+(function () { var s = $("plType"), h = ""; for (var i = 0; i < PLTYPES.length; i++) h += "<option value='" + PLTYPES[i][0] + "'>" + PLTYPES[i][1] + " " + PLTYPES[i][2] + "</option>"; s.innerHTML = h;
+  var b = ""; for (var j = 0; j < NEAR.length; j++) b += "<a class='btn sm' target='_blank' rel='noopener' href='https://maps.apple.com/?q=" + encodeURIComponent(NEAR[j][0]) + "'>" + NEAR[j][1] + "</a>"; $("nearBtns").innerHTML = b; })();
+
+/* ---------- risques locaux ---------- */
+var RISKS = [["flood","🌊","Inondation / crue / submersion","flood"],["indus","🏭","Site industriel (Seveso) à proximité","cbrn"],["nuke","☢️","Centrale nucléaire à moins de 20 km","cbrn"],["fire","🌲","Feu de forêt / végétation",null],["quake","🏚️","Séisme",null],["ground","⛰️","Mouvement de terrain / cavités",null],["storm","🌪️","Tempête / vents violents","storm"],["snow","❄️","Neige, verglas, grand froid","cold"],["heat","🌡️","Canicule","heat"],["dam","🏞️","Rupture de barrage (zone en aval)","flood"],["tmd","🚚","Transport de matières dangereuses (autoroute, voie ferrée, gazoduc)","cbrn"],["radon","🫧","Radon","" ]];
+var RTIPS = { fire: "Débroussailler autour du bâtiment (obligation légale dans les zones à risque), garder un accès dégagé pour les pompiers. En cas de feu proche : se confiner dans un bâtiment solide, fermer volets, boucher les aérations avec des linges mouillés ; ne pas fuir à pied ou en voiture dans la fumée.", quake: "Pendant la secousse : s'abriter sous une table solide, se protéger la tête, rester loin des fenêtres ; dehors, s'éloigner des bâtiments et des lignes électriques. Après : couper gaz et électricité, sortir avec prudence (répliques), ne pas prendre l'ascenseur.", ground: "Signaler fissures nouvelles, portes qui coincent, affaissements à la mairie. En cas d'effondrement : s'éloigner rapidement de la zone, ne pas revenir sur ses pas.", radon: "Gaz naturel radioactif qui s'accumule dans les sous-sols : aérer quotidiennement, faire un dépistage (kits de mesure) si la commune est en zone 3." };
+var risks = {
+  render: function () {
+    var d = store.get("risk", {}), h = "<div class='card' style='padding:4px 12px'>";
+    for (var i = 0; i < RISKS.length; i++) {
+      var r = RISKS[i], on = !!d["r_" + r[0]];
+      h += "<div class='chk" + "'><input type='checkbox' " + (on ? "checked" : "") + " onchange='risks.tog(\"" + r[0] + "\")'><span style='flex:1'>" + r[1] + " " + esc(r[2]) + "</span>" + (on && r[3] ? "<button class='btn sm' onclick='risks.guide(\"" + r[3] + "\")'>Que faire</button>" : "") + "</div>";
+      if (on && RTIPS[r[0]]) h += "<div class='mut' style='padding:0 4px 10px 36px'>" + RTIPS[r[0]] + "</div>";
+    }
+    $("rkList").innerHTML = h + "</div>";
+  },
+  tog: function (k) { var d = store.get("risk", {}); d["r_" + k] = !d["r_" + k]; store.set("risk", d); this.render(); },
+  guide: function (id) { for (var i = 0; i < GUIDES.length; i++) if (GUIDES[i].id === id) openDetail(GUIDES[i]); }
+};
+
+/* ---------- voisins ---------- */
+var neigh = {
+  get: function () { return store.get("neigh", []); },
+  save: function (l) { store.set("neigh", l); this.render(); },
+  add: function () { var n = $("nbName").value.trim(); if (!n) { toast("Nom requis"); return; } var l = this.get(); l.push({ id: Date.now(), n: n, t: $("nbTel").value.trim(), a: $("nbAddr").value.trim(), no: $("nbNote").value.trim() }); ["nbName", "nbTel", "nbAddr", "nbNote"].forEach(function (i) { $(i).value = ""; }); this.save(l); },
+  del: function (id) { this.save(this.get().filter(function (x) { return x.id !== id; })); },
+  render: function () {
+    var l = this.get(), h = "";
+    for (var i = 0; i < l.length; i++) { var x = l[i]; h += "<div class='card'><div class='row'><b style='flex:1'>" + esc(x.n) + "</b><button class='btn sm' style='flex:0 0 auto' onclick='neigh.del(" + x.id + ")'>✕</button></div>" + (x.a ? "<div class='mut'>" + esc(x.a) + "</div>" : "") + (x.no ? "<div>" + esc(x.no) + "</div>" : "") + (x.t ? "<div class='row' style='margin-top:8px'><a class='btn sm' href='" + telHref(x.t) + "'>📞 " + esc(x.t) + "</a><a class='btn sm' href='sms:" + x.t.replace(/\s/g, "") + "'>✉️ SMS</a></div>" : "") + "</div>"; }
+    $("nbList").innerHTML = h || "<p class='mut'>Aucun contact de proximité.</p>";
+  }
+};
+
+/* ---------- EPI ---------- */
+var PPECATS = [["head","⛑️","Tête"],["eyes","🥽","Yeux / visage"],["resp","😷","Voies respiratoires"],["ears","🎧","Audition"],["hands","🧤","Mains"],["feet","🥾","Pieds"],["body","🦺","Corps / visibilité"],["other","🧰","Divers"]];
+var DEFPPE = [
+ ["head","Casque de chantier (EN 397)"],["head","Bonnet / cagoule chaude"],
+ ["eyes","Lunettes de protection à branches (EN 166)"],["eyes","Lunettes-masque étanches (poussières, projections)"],["eyes","Écran facial"],
+ ["resp","Masques FFP2 (boîte)"],["resp","Masques FFP3 (boîte)"],["resp","Demi-masque réutilisable + filtres ABEK1-P3"],["resp","Cagoule d'évacuation fumées (EN 403)"],
+ ["ears","Bouchons d'oreilles mousse (EN 352-2)"],["ears","Casque antibruit (EN 352-1)"],
+ ["hands","Gants de manutention cuir / anti-coupure (EN 388)"],["hands","Gants nitrile jetables"],["hands","Gants chimiques longs nitrile/néoprène (EN 374)"],["hands","Gants grand froid (EN 511)"],
+ ["feet","Chaussures de sécurité S3 (EN ISO 20345)"],["feet","Bottes de sécurité caoutchouc"],
+ ["body","Gilet haute visibilité classe 2 (EN ISO 20471)"],["body","Veste de pluie haute visibilité"],["body","Combinaison jetable type 5/6 (poussières, salissures)"],["body","Vêtements techniques en couches (froid)"],["body","Couverture de survie"],
+ ["other","Lampe frontale"],["other","Sifflet"]
+];
+var PPESIT = [
+ {ic:"🔥",t:"Fumées d'incendie",p:["Cagoule d'évacuation (EN 403) pour sortir","Sinon : linge humide sur le nez et la bouche, se baisser (l'air est plus respirable près du sol)"],w:"Un masque FFP2/FFP3 ne protège PAS des gaz d'incendie (monoxyde de carbone, cyanure). Il ne filtre que les particules. La priorité est de sortir."},
+ {ic:"🌫️",t:"Cendres, poussières, amiante possible (après incendie, séisme, démolition)",p:["Masque FFP3 bien ajusté (FFP2 au minimum)","Lunettes-masque étanches","Gants de manutention","Combinaison jetable type 5/6","Chaussures de sécurité S3 (clous, verre)"],w:"Ne pas balayer à sec : humidifier les poussières. Toiture ou matériaux d'avant 1997 cassés : risque d'amiante, laisser faire des professionnels."},
+ {ic:"🌊",t:"Nettoyage après inondation (boues, moisissures)",p:["Bottes de sécurité caoutchouc","Gants longs étanches (EN 374) sur gants anti-coupure","Masque FFP2 ou FFP3 (moisissures)","Lunettes de protection","Vêtements couvrants à laver à part ou combinaison jetable"],w:"Eaux souillées (égouts, carburant) : se laver les mains souvent, désinfecter toute coupure, consulter si plaie infectée. Vaccin antitétanique à jour."},
+ {ic:"🦠",t:"Épidémie / maladie respiratoire",p:["Masques FFP2 (ou chirurgicaux pour le malade)","Gants nitrile jetables pour soigner un malade","Gel hydroalcoolique"],w:"Un masque se change quand il est humide ou après 4 à 8 h selon le fabricant. Se laver les mains avant de le mettre et après l'avoir retiré."},
+ {ic:"☣️",t:"Produits chimiques (ménagers, agricoles, fuite)",p:["Gants chimiques adaptés au produit (EN 374)","Lunettes-masque ou écran facial","Demi-masque à cartouches du bon type (A vapeurs organiques, B gaz inorganiques, E acides, K ammoniac)","Combinaison et bottes"],w:"En cas de fuite ou de nuage toxique, la consigne est de se confiner, pas de s'équiper pour aller voir. Aucun filtre ne protège d'un manque d'oxygène ni du monoxyde de carbone."},
+ {ic:"🚛",t:"Chargement / arrimage plateau, chantier",p:["Chaussures de sécurité S3","Gilet haute visibilité","Gants de manutention anti-coupure (sangles, chaînes, tôles)","Casque sur chantier et sous une charge levée","Lunettes de protection (sangles sous tension, meulage)"],w:"Ne jamais passer sous une charge suspendue. Vérifier l'état des gants : une sangle ou une chaîne qui lâche sous tension coupe."},
+ {ic:"🪚",t:"Tronçonneuse / débroussaillage (tempête)",p:["Casque forestier avec visière grillagée et coquilles antibruit","Pantalon ou jambières anti-coupure (EN ISO 11393)","Gants anti-coupure","Chaussures ou bottes anti-coupure"],w:"Arbres couchés sous tension (chablis) : très dangereux même pour des habitués. En cas de doute, laisser faire les pros."},
+ {ic:"🛣️",t:"Panne ou accident sur la route",p:["Gilet haute visibilité enfilé AVANT de sortir du véhicule","Triangle à 30 m au moins (si sans danger pour le poser)","Lampe frontale la nuit"],w:"Sur autoroute : se mettre derrière la glissière, appeler depuis une borne ou le 112. En France, gilet et triangle sont obligatoires dans tout véhicule."},
+ {ic:"❄️",t:"Froid intense / travail dehors l'hiver",p:["Couches : sous-vêtement respirant, polaire, veste coupe-vent imperméable","Bonnet, gants grand froid (EN 511) + sous-gants","Chaussettes laine, chaussures isolantes"],w:"Changer immédiatement de vêtements mouillés : l'humidité multiplie la perte de chaleur."}
+];
+var PPEG = [
+ {id:"masks",ic:"😷",t:"Masques respiratoires : lequel choisir ?",k:"masque ffp2 ffp3 cartouche filtre",b:"<table><tr><th>Type</th><th>Protège de</th><th>Ne protège pas de</th></tr><tr><td><b>Chirurgical</b></td><td>Projections du porteur (protège les autres)</td><td>Poussières fines, gaz</td></tr><tr><td><b>FFP1</b></td><td>≥ 80 % des particules (poussières non toxiques)</td><td>Gaz, fumées toxiques</td></tr><tr><td><b>FFP2</b></td><td>≥ 94 % des particules (virus, moisissures, cendres)</td><td>Gaz, vapeurs</td></tr><tr><td><b>FFP3</b></td><td>≥ 99 % des particules (amiante, poussières toxiques)</td><td>Gaz, vapeurs</td></tr><tr><td><b>Cartouches A/B/E/K</b></td><td>Gaz et vapeurs du type indiqué</td><td>Manque d'oxygène, CO</td></tr></table><h3>Code couleur des filtres (EN 14387)</h3><ul class='dots'><li><b style='color:#b97a3f'>A marron</b> : vapeurs organiques (solvants, peintures, carburants)</li><li><b style='color:#aaa'>B gris</b> : gaz inorganiques (chlore, H₂S)</li><li><b style='color:#e5c100'>E jaune</b> : gaz acides (SO₂)</li><li><b style='color:#46a758'>K vert</b> : ammoniac</li><li><b>P blanc</b> : particules (P3 = le plus efficace)</li></ul><h3>Bien le porter</h3><ol class='steps'><li>Se laver les mains, tenir le masque par les élastiques.</li><li>Barrette nasale pincée sur le nez, masque sous le menton.</li><li>Test d'étanchéité : mains en coupe, expirer fort ; aucune fuite sur les bords.</li><li>La barbe empêche l'étanchéité : être rasé si on doit compter sur un FFP3.</li><li>Vérifier la date de péremption sur la boîte ; une cartouche ouverte s'use même sans servir (date notée dessus).</li></ol>"},
+ {id:"eyes",ic:"🥽",t:"Protection des yeux et du visage",k:"lunettes yeux visage écran en 166",b:"<ul class='dots'><li><b>Lunettes à branches</b> (EN 166) : projections solides (meulage, débroussaillage léger, sangle).</li><li><b>Lunettes-masque</b> : poussières fines, liquides, gaz lacrymogènes ou irritants légers. Indispensables avec les cendres et les boues.</li><li><b>Écran facial</b> : projections de liquides ou d'éclats sur tout le visage ; à porter <b>avec</b> des lunettes pour les éclats.</li><li>Marquage utile : « 3 » gouttelettes et liquides, « 4 » grosses poussières, « 5 » gaz et fines poussières, « K » anti-rayure, « N » anti-buée.</li><li>Porteur de lunettes de vue : surlunettes ou lunettes-masque compatibles.</li></ul><div class='infobox'>Produit dans l'œil : rincer 15 minutes à l'eau claire, paupières bien ouvertes, puis appeler le 15.</div>"},
+ {id:"hands",ic:"🧤",t:"Gants : quel marquage pour quel risque",k:"gants en 388 en 374 nitrile cuir coupure",b:"<ul class='dots'><li><b>EN 388</b> (risques mécaniques) : 4 chiffres + lettres = abrasion, coupure, déchirure, perforation, puis niveau de coupure ISO A à F. Pour sangles, chaînes, tôles : viser au moins C.</li><li><b>EN 374</b> (chimique) : liste des produits testés. Le nitrile résiste bien aux carburants et huiles ; le néoprène aux acides et bases ; le latex est peu protecteur contre les solvants.</li><li><b>EN 511</b> : froid (convection, contact, imperméabilité).</li><li><b>Nitrile jetable</b> : soins, hygiène, petites manipulations. Pas pour les produits agressifs prolongés.</li><li>Changer les gants troués, durcis ou imbibés. Retirer les gants souillés en les retournant, sans toucher l'extérieur.</li></ul>"},
+ {id:"feet",ic:"🥾",t:"Chaussures et bottes de sécurité",k:"chaussures sécurité s1 s3 bottes",b:"<table><tr><th>Classe</th><th>Caractéristiques</th></tr><tr><td><b>SB</b></td><td>Embout de protection 200 J</td></tr><tr><td><b>S1</b></td><td>+ talon absorbant, antistatique, arrière fermé</td></tr><tr><td><b>S1P</b></td><td>S1 + semelle anti-perforation</td></tr><tr><td><b>S2</b></td><td>S1 + résistance à l'eau</td></tr><tr><td><b>S3</b></td><td>S2 + anti-perforation + semelle à crampons</td></tr></table><p>Pour la route, le plateau et les débris après sinistre : <b>S3</b>. Marquages complémentaires : <b>SRC</b> antidérapant, <b>CI</b> isolation du froid, <b>WR</b> étanche, <b>HRO</b> semelle chaleur.</p>"},
+ {id:"hearing",ic:"🎧",t:"Protection auditive",k:"bruit auditive bouchons casque antibruit db",b:"<ul class='dots'><li>Au-delà de <b>80 dB</b> en continu (outils, groupe électrogène, tronçonneuse), protéger les oreilles. Tronçonneuse ≈ 105–110 dB.</li><li>La valeur <b>SNR</b> indique l'atténuation (en dB). 25 à 30 dB suffisent pour la plupart des outils.</li><li>Bouchons mousse : les rouler finement, tirer l'oreille vers le haut et l'arrière, insérer, tenir 20 s le temps qu'ils gonflent.</li><li>Garder la possibilité d'entendre les alertes : retirer les protections dès que le bruit cesse.</li></ul>"},
+ {id:"hv",ic:"🦺",t:"Haute visibilité",k:"gilet haute visibilité jaune orange en 20471 classe",b:"<ul class='dots'><li><b>EN ISO 20471</b> : classe 1 (faible), classe 2 (gilet standard, obligatoire en voiture en France), classe 3 (veste ou combinaison, intervention sur voirie).</li><li>Un gilet par occupant est conseillé, rangé dans l'habitacle (pas dans le coffre) pour l'enfiler avant de sortir.</li><li>Remplacer un gilet délavé, sale ou dont les bandes réfléchissantes sont abîmées : il perd son efficacité.</li></ul>"},
+ {id:"care",ic:"🔁",t:"Entretien et durée de vie",k:"entretien péremption durée de vie stockage remplacement",b:"<ul class='dots'><li><b>Casque</b> : remplacer après tout choc important, et selon la durée indiquée par le fabricant (date moulée à l'intérieur ; souvent quelques années pour les casques plastiques).</li><li><b>Masques et cartouches</b> : date de péremption sur l'emballage ; stocker au sec, à l'abri de la chaleur et de la lumière.</li><li><b>Gants, bottes caoutchouc</b> : vérifier qu'ils ne sont ni fendillés ni collants avant usage.</li><li><b>Couverture de survie</b> : ne pas la déplier pour « voir » ; en racheter une si elle a servi.</li><li>Ranger un kit EPI de base <b>dans le véhicule</b> et un <b>à la maison</b>.</li></ul>"}
+];
+function Inv(name, key, cats, defs, ids, label) {
+  this.name = name; this.key = key; this.cats = cats; this.defs = defs; this.ids = ids; this.label = label; this.edit = null;
+  $(ids.cat).innerHTML = cats.map(function (c) { return "<option value='" + c[0] + "'>" + c[1] + " " + c[2] + "</option>"; }).join("");
+}
+Inv.prototype = {
+  get: function () { return store.get(this.key, this.defs.map(function (x, i) { return { id: i + 1, c: x[0], n: x[1], h: false, s: "", l: "", e: "" }; })); },
+  save: function (l) { store.set(this.key, l); this.render(); renderHome(); },
+  tog: function (id) { var l = this.get(); l.forEach(function (x) { if (x.id === id) x.h = !x.h; }); this.save(l); },
+  del: function (id) { this.save(this.get().filter(function (x) { return x.id !== id; })); },
+  open: function (id) { this.edit = this.edit === id ? null : id; this.render(); },
+  set: function (id, f, v) { var l = this.get(); l.forEach(function (x) { if (x.id === id) x[f] = v; }); store.set(this.key, l); renderHome(); },
+  add: function () { var n = $(this.ids.newN).value.trim(); if (!n) { toast("Désignation requise"); return; } var l = this.get(); l.push({ id: Date.now(), c: $(this.ids.cat).value, n: n, h: true, s: "", l: "", e: "" }); $(this.ids.newN).value = ""; this.save(l); },
+  alerts: function (al) { var l = store.get(this.key, []); for (var i = 0; i < l.length; i++) { var d = daysUntil(l[i].e); if (l[i].h && d !== null && d <= 30) al.push((d < 0 ? "⛔ " + this.label + " échu : " : "⚠️ " + this.label + " à renouveler dans " + d + " j : ") + l[i].n); } },
+  render: function () {
+    var l = this.get(), h = "", have = 0, N = this.name;
+    for (var c = 0; c < this.cats.length; c++) {
+      var cat = this.cats[c], items = l.filter(function (x) { return x.c === cat[0]; }); if (!items.length) continue;
+      h += "<h3>" + cat[1] + " " + cat[2] + "</h3><div class='card' style='padding:4px 12px'>";
+      for (var i = 0; i < items.length; i++) {
+        var x = items[i], d = daysUntil(x.e), pill = ""; if (x.h) have++;
+        if (d !== null) pill = d < 0 ? " <span class='pill r'>échu</span>" : d <= 30 ? " <span class='pill w'>" + d + " j</span>" : "";
+        var meta = [x.s && "Taille/modèle " + x.s, x.l && "📍 " + x.l, x.e && "⏳ " + x.e.split("-").reverse().join("/")].filter(Boolean).join(" · ");
+        h += "<div class='chk'><input type='checkbox' " + (x.h ? "checked" : "") + " onchange='" + N + ".tog(" + x.id + ")'><span style='flex:1'>" + esc(x.n) + pill + (meta ? "<br><span class='mut'>" + esc(meta) + "</span>" : "") + "</span><button class='btn sm' onclick='" + N + ".open(" + x.id + ")'>✎</button></div>";
+        if (this.edit === x.id) h += "<div style='padding:4px 0 12px'><div class='row'><div><label>Taille / modèle</label><input value='" + esc(x.s) + "' onchange='" + N + ".set(" + x.id + ",\"s\",this.value)'></div><div><label>Emplacement</label><input value='" + esc(x.l) + "' placeholder='maison, camion…' onchange='" + N + ".set(" + x.id + ",\"l\",this.value)'></div></div><label>Date limite (péremption, pile, contrôle)</label><input type='date' value='" + esc(x.e) + "' onchange='" + N + ".set(" + x.id + ",\"e\",this.value)'><div class='row' style='margin-top:8px'><button class='btn sm acc' onclick='" + N + ".open(" + x.id + ")'>OK</button><button class='btn sm' onclick='" + N + ".del(" + x.id + ")'>Supprimer</button></div></div>";
+      }
+      h += "</div>";
+    }
+    $(this.ids.list).innerHTML = h;
+    var pct = l.length ? Math.round(have * 100 / l.length) : 0; $(this.ids.pct).textContent = have + "/" + l.length; $(this.ids.bar).style.width = pct + "%";
+  }
+};
+var ppe = new Inv("ppe", "ppe", PPECATS, DEFPPE, {cat:"ppeNewCat", newN:"ppeNewN", list:"ppeList", pct:"ppePct", bar:"ppeBar"}, "EPI");
+
+(function () {
+  $("ppeSit").innerHTML = PPESIT.map(function (s) { return "<div class='card'><b>" + s.ic + " " + esc(s.t) + "</b><ul class='dots'>" + s.p.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul><div class='mut'>⚠️ " + esc(s.w) + "</div></div>"; }).join("");
+})();
+
+/* ---------- équipement de sécurité personnel ---------- */
+var SEQCATS = [["perso","🚶","Sur soi"],["phone","📱","Téléphone & numérique"],["home","🏠","Domicile"],["vehicle","🚛","Véhicule / camion"],["travel","🧳","Voyage / hôtel"]];
+var DEFSEQ = [
+ ["perso","Alarme personnelle (sirène ≥ 120 dB)"],["perso","Sifflet"],["perso","Lampe torche puissante (≥ 500 lumens)"],["perso","Batterie externe chargée + câble"],["perso","Numéros d'urgence et contacts sur papier"],["perso","Mini-trousse de secours (pansement compressif, gants)"],
+ ["phone","Appel d'urgence SOS configuré"],["phone","Contacts d'urgence renseignés"],["phone","Fiche médicale (app Santé) visible sur écran verrouillé"],["phone","Partage de position avec un proche de confiance"],["phone","Protection en cas de vol de l'appareil activée"],["phone","Double authentification (mail, banque, Apple ID)"],["phone","Traceur Bluetooth (AirTag) sur clés / sac / valise"],
+ ["home","Détecteur de fumée (NF EN 14604)"],["home","Détecteur de monoxyde de carbone (NF EN 50291)"],["home","Extincteur ABC 6 kg ou couverture anti-feu"],["home","Serrure multipoints / cylindre haute sécurité"],["home","Entrebâilleur + judas"],["home","Éclairage extérieur à détection"],["home","Alarme ou détecteurs d'ouverture"],["home","Coffre fixé au mur ou au sol"],["home","Inventaire photo des objets de valeur"],
+ ["vehicle","Gilet haute visibilité + triangle"],["vehicle","Extincteur véhicule (vérifié)"],["vehicle","Sangle ou barre de verrouillage des portes cabine"],["vehicle","Alarme cabine / détecteur d'ouverture"],["vehicle","Antivol de sellette (verrou de pivot d'attelage)"],["vehicle","Scellés numérotés / cadenas haute sécurité"],["vehicle","Traceur GPS remorque"],["vehicle","Caméra embarquée (dashcam)"],["vehicle","Brise-vitre / coupe-ceinture"],
+ ["travel","Bloqueur ou alarme de porte (hôtel)"],["travel","Pochette sous les vêtements / ceinture porte-billets"],["travel","Étui anti-RFID pour cartes"],["travel","Cadenas pour bagages"],["travel","Copies des papiers (papier + numérique)"]
+];
+var SEQG = [
+ {id:"iphone",ic:"📱",t:"Configurer l'iPhone pour les urgences",k:"iphone sos urgence contacts localisation satellite vérification",b:
+ "<ol class='steps'><li><b>Appel d'urgence SOS</b> : Réglages → Appel d'urgence SOS. Active « Appeler en maintenant » (bouton latéral + un bouton de volume) et « Appeler en appuyant 5 fois » sur le bouton latéral. Le téléphone appelle les secours du pays où tu te trouves.</li><li><b>Contacts d'urgence</b> : app Santé → ta photo → Fiche médicale → Modifier → Contacts d'urgence. Après un appel SOS, ils reçoivent un SMS avec ta position.</li><li><b>Fiche médicale</b> : même écran, active « Afficher si verrouillé ». Les secours la voient sans ton code.</li><li><b>Détection des accidents</b> (iPhone 14 et plus récents) : Réglages → Appel d'urgence SOS → « Appeler après un accident grave ».</li><li><b>Vérification</b> (app Messages, iOS 17 et plus) : préviens automatiquement un proche quand tu es arrivé ; s'il ne reçoit rien, il voit ta position. Pratique pour un trajet de nuit ou une rando.</li><li><b>SOS d'urgence par satellite</b> (iPhone 14 et plus récents) : disponible en France et dans plusieurs pays d'Europe, sans réseau mobile, en extérieur avec le ciel dégagé. Teste la démo : Réglages → Appel d'urgence SOS → Démo.</li><li><b>Protection en cas de vol de l'appareil</b> : Réglages → Face ID et code. Empêche un voleur qui connaît ton code de changer ton mot de passe Apple.</li><li><b>Alertes gouvernementales</b> : Réglages → Notifications, tout en bas : laisser activé.</li></ol>"},
+ {id:"alarm",ic:"📢",t:"Alarme personnelle, sifflet, lampe",k:"alarme personnelle sirène sifflet lampe torche dissuasion",b:
+ "<ul class='dots'><li><b>Alarme personnelle</b> : on tire la goupille, elle hurle (120 dB et plus). But : attirer l'attention et surprendre l'agresseur pour fuir. La porter à la main ou sur la sangle du sac, pas au fond. Tester la pile chaque mois.</li><li><b>Sifflet</b> : sert aussi à se signaler si on est coincé (décombres, perdu) : 3 coups répétés. Ne consomme rien, ne tombe jamais en panne.</li><li><b>Lampe puissante</b> : éclairer un parking, une cabine, un recoin avant d'y entrer ; un faisceau fort au visage éblouit quelques secondes et permet de s'éloigner. Batterie rechargeable + piles de secours.</li></ul><div class='infobox'>Le meilleur équipement reste la distance : un objet d'alarme sert à créer l'occasion de partir et d'alerter, pas à rester sur place.</div>"},
+ {id:"law",ic:"⚖️",t:"Objets d'autodéfense : ce que dit la loi",k:"bombe lacrymogène gaz poivre couteau matraque arme légitime défense loi",b:
+ "<p><b>En France</b> (à vérifier si la loi change) :</p><ul class='dots'><li>Les <b>aérosols lacrymogènes</b> de 100 ml maximum (catégorie D) peuvent être achetés par les majeurs, mais leur <b>port et leur transport sont interdits sans motif légitime</b>. Le fait d'avoir peur dans la rue n'est généralement pas reconnu comme motif légitime.</li><li>Même règle pour les couteaux et autres armes blanches : un couteau d'outil dans la cabine pour le travail est justifiable, un couteau porté « pour se défendre » ne l'est pas.</li><li>Les <b>shockers de contact</b> (matraque, poing électrique) sont aussi en catégorie D, avec la même interdiction de port. Les armes électriques qui tirent à distance (type Taser) relèvent de la catégorie B, soumise à autorisation.</li><li><b>Armes à feu</b> : la « défense personnelle » n'est plus un motif d'autorisation pour un particulier. Une arme de poing de catégorie B n'est accordée qu'au tireur sportif licencié, ou à une personne exposée à des risques sérieux du fait de son activité professionnelle (autorisation préfectorale, 1 arme, 50 cartouches). Le port hors du domicile reste interdit sauf autorisation exceptionnelle : jusqu'à 7 ans de prison pour une arme A ou B.</li><li><b>Légitime défense</b> (article 122-5 du Code pénal) : la riposte doit être <b>immédiate, nécessaire et proportionnée</b> à une attaque injuste en cours. Fuir reste toujours préférable quand c'est possible.</li></ul><div class='warnbox'><b>Attention au passage des frontières</b> : les bombes au poivre ou lacrymogènes sont interdites ou très encadrées dans plusieurs pays de ton corridor (notamment Belgique, Pays-Bas, Luxembourg, pays nordiques). Un produit légal en France peut valoir une saisie et des poursuites ailleurs. Vérifie la loi de chaque pays traversé avant d'en avoir dans le camion.</div><p class='mut'>Ces informations ne remplacent pas l'avis d'un avocat.</p>"},
+ {id:"truckeq",ic:"🚛",t:"Équiper la cabine et la remorque",k:"camion cabine remorque antivol sellette scellés traceur gps alarme vol fret",b:
+ "<ul class='dots'><li><b>Verrouillage des portes cabine</b> : sangle ou barre reliant les deux poignées intérieures, pour empêcher l'ouverture même si la serrure est forcée pendant le repos.</li><li><b>Alarme cabine / détecteur d'ouverture</b> : réveille si quelqu'un touche les portes ou le réservoir.</li><li><b>Bouchon de réservoir à clé</b> et, si besoin, dispositif anti-siphonnage.</li><li><b>Antivol de sellette</b> (verrou sur le pivot d'attelage) : empêche d'atteler la remorque dételée sur un parking.</li><li><b>Scellés numérotés</b> : noter les numéros sur le CMR ; un scellé cassé prouve l'ouverture et protège ta responsabilité.</li><li><b>Traceur GPS</b> indépendant, caché dans la remorque, avec alerte de mouvement.</li><li><b>Dashcam</b> : utile pour les litiges et les accidents. Usage personnel autorisé ; ne pas diffuser d'images où l'on reconnaît des personnes ou des plaques.</li><li>Garer de façon à ce que les portes arrière soient bloquées (contre un mur ou un autre véhicule).</li></ul>"},
+ {id:"homeeq",ic:"🏠",t:"Détecteurs et extincteur à la maison",k:"détecteur fumée monoxyde extincteur couverture anti-feu",b:
+ "<ul class='dots'><li><b>Détecteur de fumée</b> (NF EN 14604) : obligatoire en France, au moins un par logement, idéalement un par étage et dans le couloir des chambres. Tester le bouton chaque mois, remplacer l'appareil à la date indiquée (souvent 10 ans).</li><li><b>Détecteur de monoxyde de carbone</b> (NF EN 50291) : conseillé dès qu'il y a une chaudière, un poêle, une cheminée ou un groupe électrogène.</li><li><b>Extincteur</b> poudre ABC 6 kg près de la cuisine ou du garage (pas dans la cuisine même) ; vérifier la jauge, faire contrôler selon le fabricant. <b>Couverture anti-feu</b> pour un feu de casserole (ne jamais y jeter d'eau).</li><li>Utilisation de l'extincteur (méthode PASS) : <b>P</b>oupille retirée, <b>A</b>ttaquer à la base des flammes, <b>S</b>errer la poignée, <b>S</b>alayer de gauche à droite. Garder la sortie dans le dos. Si le feu ne baisse pas en 30 s : sortir, fermer la porte, appeler le 18 / 112.</li></ul>"},
+ {id:"track",ic:"📍",t:"Traceurs et caméras : bon usage",k:"airtag traceur gps caméra surveillance vie privée légal",b:
+ "<ul class='dots'><li>Un traceur (AirTag, GPS) est fait pour <b>tes biens</b> : clés, sacs, valise, remorque. Le placer sur une personne ou dans le véhicule de quelqu'un sans son accord est un délit (atteinte à la vie privée), et l'iPhone de la personne la prévient de toute façon.</li><li>Si ton iPhone t'avertit qu'un AirTag inconnu te suit : le faire sonner, le trouver, et si tu te sens en danger, aller dans un lieu fréquenté et appeler le 17.</li><li><b>Caméras au domicile</b> : elles doivent filmer ta propriété, pas la voie publique ni chez les voisins. Un panneau est obligatoire si tu as des employés ou du public.</li><li>Conserver les images seulement le temps utile ; les remettre à la police en cas de plainte.</li></ul>"}
+];
+
+/* ---------- survivaliste : niveaux ---------- */
+var LEVELS = [
+ {id:"l1",t:"Niveau 1 — Tenir 72 heures",d:"Le socle recommandé par les autorités.",it:["Sac d'urgence 72 h complet (onglet Kit)","Eau : 9 L par personne (3 L/jour)","Nourriture sans cuisson pour 3 jours","Radio à piles ou dynamo","Lampes et piles","Trousse de secours + médicaments 7 jours","Argent liquide","Copies des papiers"]},
+ {id:"l2",t:"Niveau 2 — Tenir 2 semaines",d:"Coupure prolongée, tempête, pénurie : rester chez soi sans aide extérieure.",it:["Eau : 42 L par personne (bouteilles + jerricans alimentaires)","Moyen de traiter l'eau (filtre + pastilles)","Nourriture 14 jours, mangée et remplacée en rotation","Réchaud + combustible pour 14 jours","Chauffage d'appoint sûr ou vêtements et duvets chauds","Toilettes de secours (seau, sacs, sciure)","Hygiène : savon, gel, papier, sacs poubelle","Batterie ou station électrique pour téléphone, lampes, radio","Médicaments personnels pour 1 mois (avec le médecin)","Plan familial et contacts sur papier"]},
+ {id:"l3",t:"Niveau 3 — Tenir 3 mois",d:"Crise longue : chômage, pénurie durable, isolement.",it:["Stock rotatif 3 mois (riz, pâtes, légumineuses, conserves, huile, sel, sucre, miel)","Récupération d'eau de pluie + filtre gravitaire","Panneau solaire + station électrique","Potager, même petit, et semences reproductibles","Matériel de conservation (bocaux, déshydrateur)","Outils manuels (scie, hachette, pelle, outils de jardin)","Réserve de bois ou de combustible","Compétences : premiers secours PSC1, jardinage, conserves","Réseau d'entraide avec les voisins"]},
+ {id:"l4",t:"Niveau 4 — Autonomie longue durée",d:"Résilience durable : base de repli, production propre, communauté.",it:["Base de repli identifiée et équipée","Source d'eau autonome (puits, source, citerne)","Chauffage autonome (poêle à bois)","Production alimentaire régulière (potager, verger, petit élevage)","Énergie autonome (solaire dimensionné)","Moyens de communication hors réseau (CB, PMR, radioamateur)","Compétences : mécanique, couture, menuiserie, soins","Groupe ou communauté de confiance avec rôles définis"]},
+ {id:"skills",t:"Compétences à acquérir",d:"Le matériel sans savoir-faire ne vaut pas grand-chose.",it:["Formation PSC1 (premiers secours, une journée)","Lire une carte IGN et utiliser une boussole","Allumer un feu par temps humide","5 nœuds utiles (voir Bushcraft)","Monter un abri avec une bâche","Purifier l'eau","Faire des conserves en bocaux","Cultiver quelques légumes de base","Réparer un vêtement, une crevaison, un petit appareil","Utiliser une radio CB / PMR"]}
+];
+var lvl = {
+  render: function () {
+    var d = store.get("surv", {}), h = "";
+    for (var i = 0; i < LEVELS.length; i++) {
+      var L = LEVELS[i], done = 0, rows = "";
+      for (var j = 0; j < L.it.length; j++) { var k = L.id + "_" + j, on = !!d[k]; if (on) done++; rows += "<div class='chk" + (on ? " done" : "") + "'><input type='checkbox' " + (on ? "checked" : "") + " onchange='lvl.tog(\"" + k + "\")'><span>" + esc(L.it[j]) + "</span></div>"; }
+      var pct = Math.round(done * 100 / L.it.length);
+      h += "<div class='card'><div class='row'><b style='flex:1'>" + esc(L.t) + "</b><span class='pill" + (pct === 100 ? " g" : "") + "'>" + done + "/" + L.it.length + "</span></div><div class='mut'>" + esc(L.d) + "</div><div class='bar'><i style='width:" + pct + "%'></i></div>" + rows + "</div>";
+    }
+    $("lvlList").innerHTML = h;
+  },
+  tog: function (k) { var d = store.get("surv", {}); d[k] = !d[k]; store.set("surv", d); this.render(); }
+};
+var BOV = ["Réservoir toujours au moins à moitié plein","Jerrican de carburant homologué (en rotation)","Sac d'urgence dans le véhicule","Eau 6 L + nourriture 2 jours","Couverture, vêtements chauds, chaussures de marche","Cartes routières papier","Chargeur 12/24 V, câbles","Kit crevaison / compresseur, câbles de démarrage","Pelle pliante, sangle de remorquage","Gilet, triangle, lampe"];
+function renderBov() { var d = store.get("surv", {}), h = ""; for (var i = 0; i < BOV.length; i++) { var k = "bov_" + i, on = !!d[k]; h += "<div class='chk" + (on ? " done" : "") + "'><input type='checkbox' " + (on ? "checked" : "") + " onchange='lvl.tog(\"" + k + "\");renderBov()'><span>" + esc(BOV[i]) + "</span></div>"; } $("bovList").innerHTML = h; }
+
+/* ---------- bushcraft ---------- */
+var BUSH = [
+ {id:"knots",ic:"🪢",t:"Les 5 nœuds utiles",k:"noeud chaise cabestan taquet tendeur prusik corde",b:
+ "<ol class='steps'><li><b>Nœud de chaise</b> : boucle fixe qui ne glisse pas et se défait facilement même après forte charge. Pour s'encorder, tirer, amarrer. Moyen mnémotechnique : le lapin sort du terrier, fait le tour de l'arbre et rentre dans le terrier.</li><li><b>Demi-clés à capeler (cabestan)</b> : fixer rapidement une corde à un arbre ou un piquet. Deux tours croisés, se règle facilement.</li><li><b>Nœud de tendeur (tautline)</b> : boucle réglable qui coulisse et se bloque sous tension. Pour tendre les haubans d'un tarp ou d'une tente.</li><li><b>Nœud de cabillot / à clé (slip knot)</b> : se défait d'un coup en tirant le brin libre. Pratique pour la ligne de faîtage d'un tarp.</li><li><b>Nœud de Prusik</b> : se bloque sur une autre corde quand on tire et coulisse quand on le pousse. Pour accrocher un tarp sur une ligne et le déplacer.</li></ol><p class='mut'>S'entraîner chez soi jusqu'à pouvoir les faire les yeux fermés, avec des gants : c'est ainsi qu'on les fera de nuit, sous la pluie.</p>"},
+ {id:"tarp",ic:"⛺",t:"Abri avec un tarp",k:"tarp bâche abri bivouac pluie vent",b:
+ "<ol class='steps'><li>Choisir l'emplacement : sol plat, légèrement surélevé (pas de cuvette), à l'abri du vent dominant, <b>jamais sous des branches mortes</b>, loin des lits de ruisseau.</li><li>Tendre une ligne de faîtage entre deux arbres, à hauteur de hanche à épaule.</li><li>Poser le tarp dessus, ouvert côté abrité du vent.</li><li><b>Configuration en A</b> : les deux côtés tirés vers le sol, symétriques ; bonne protection pluie.</li><li><b>Appentis (lean-to)</b> : un côté au sol face au vent, l'autre ouvert ; reçoit la chaleur d'un feu placé devant (à distance de sécurité).</li><li>Tendre les coins avec des haubans et le nœud de tendeur ; incliner suffisamment pour que l'eau s'écoule.</li><li>Isoler du sol : matelas, branchages, feuilles sèches, au moins 10 cm.</li></ol>"},
+ {id:"firelaw",ic:"🔥",t:"Feu en forêt : règles et techniques",k:"feu forêt interdit règlementation humide bois",b:
+ "<div class='warnbox'>En France, il est en principe <b>interdit d'allumer du feu dans les bois et jusqu'à 200 m de ceux-ci</b> si tu n'es pas propriétaire (ou autorisé par lui), et les préfectures renforcent l'interdiction en période de risque. Vérifie l'arrêté local avant tout feu. En situation de survie réelle, la sécurité des personnes prime, mais un feu mal maîtrisé peut provoquer un incendie.</div>"+
+ "<h3>Allumer par temps humide</h3><ul class='dots'><li>Chercher le bois mort <b>encore sur pied</b> ou accroché aux arbres : il est sec à cœur.</li><li>Fendre les branches : l'intérieur est sec même quand l'écorce est trempée.</li><li>Faire des <b>copeaux plumes</b> au couteau (feather sticks) : beaucoup de surface, s'allument facilement.</li><li>Amadou de réserve dans un sac étanche : coton + vaseline, écorce de bouleau.</li><li>Abriter le foyer de la pluie et du vent, faire une base de branches sur sol mouillé.</li></ul>"+
+ "<h3>Sécurité</h3><ul class='dots'><li>Dégager 2 m autour, éviter les racines et la tourbe (feu qui couve sous terre).</li><li>Toujours avoir de l'eau ou de la terre à côté.</li><li>Éteindre complètement : noyer, remuer, noyer à nouveau ; la main au-dessus ne doit plus sentir de chaleur.</li></ul>"},
+ {id:"map",ic:"🗺️",t:"Carte et boussole",k:"carte ign boussole azimut orientation navigation",b:
+ "<ol class='steps'><li><b>Orienter la carte</b> : poser la boussole sur la carte, tourner la carte jusqu'à ce que le nord de la carte et l'aiguille coïncident.</li><li><b>Prendre un azimut sur la carte</b> : poser le bord de la boussole entre ta position et ta destination, flèche de direction vers la destination. Tourner le cadran pour aligner ses lignes nord-sud avec le quadrillage de la carte. Lire l'azimut.</li><li><b>Suivre l'azimut</b> : tenir la boussole à plat, tourner sur toi-même jusqu'à ce que l'aiguille soit dans la flèche du cadran. Viser un repère loin devant (arbre, rocher), marcher jusqu'à lui, recommencer.</li><li><b>Déclinaison</b> : en France métropolitaine, l'écart entre nord magnétique et nord géographique est faible (quelques degrés) et souvent négligeable sur courte distance ; il augmente dans le nord de la Scandinavie.</li><li>Compter ses pas sur 100 m (environ 60 à 70 doubles pas) pour estimer les distances.</li></ol><p class='mut'>Cartes conseillées : IGN TOP 25 (1:25 000) de ta région et de ta base de repli, sous pochette étanche.</p>"},
+ {id:"findwater",ic:"💦",t:"Trouver de l'eau",k:"eau trouver source pluie rosée condensation",b:
+ "<ul class='dots'><li><b>Pluie</b> : la meilleure source. Bâche, toile, gouttières vers un récipient propre.</li><li><b>Sources et ruisseaux</b> : suivre les vallées vers le bas, chercher la végétation plus verte, les traces d'animaux qui convergent.</li><li><b>Rosée</b> : au lever du jour, essorer un tissu passé sur l'herbe haute.</li><li><b>Neige</b> : la faire fondre avant de la boire (la manger refroidit le corps).</li><li><b>Toujours traiter</b> l'eau trouvée : ébullition, filtre + pastilles (voir Guides → Eau potable).</li><li>Éviter l'eau en aval de champs cultivés, d'élevages, de routes ou de zones industrielles.</li></ul>"},
+ {id:"forage",ic:"🍄",t:"Cueillette, pêche et chasse : prudence",k:"cueillette champignons plantes sauvages pêche chasse",b:
+ "<div class='warnbox'><b>Ne jamais manger une plante ou un champignon sans identification certaine.</b> Des confusions mortelles sont fréquentes : ail des ours avec colchique ou muguet, carotte sauvage avec ciguë, champignons comestibles avec amanites. En cas de doute : faire vérifier par un pharmacien ou un mycologue. En cas de symptômes : 15 ou centre antipoison.</div>"+
+ "<ul class='dots'><li>Sources sûres et faciles en Europe : ortie (jeunes pousses cuites), pissenlit, mûres, framboises, noisettes, châtaignes, glands seulement après longue lixiviation.</li><li>Les calories viennent surtout des fruits à coque et des tubercules cultivés ; la cueillette seule nourrit très mal.</li><li><b>Pêche</b> : une carte de pêche est obligatoire en France (fédération départementale). Ligne, hameçons et plombs tiennent dans une boîte d'allumettes.</li><li><b>Chasse et piégeage</b> : strictement réglementés (permis, périodes, pièges agréés). Hors cadre légal, c'est du braconnage.</li></ul>"},
+ {id:"signal",ic:"🪞",t:"Se signaler aux secours",k:"signal miroir secours hélicoptère sos sol fumée",b:
+ "<ul class='dots'><li><b>Règle des 3</b> : 3 feux, 3 coups de sifflet, 3 éclats lumineux = détresse.</li><li><b>Miroir de signalisation</b> : viser l'aéronef à travers le trou du miroir ; visible à des dizaines de kilomètres par soleil.</li><li><b>Au sol</b> : grandes lettres « SOS » ou un « V » (besoin d'aide) en branches, pierres, vêtements contrastés, dans une clairière.</li><li><b>Hélicoptère</b> : bras levés en « Y » = « oui, j'ai besoin d'aide » ; un bras levé, l'autre baissé (« N ») = « non, pas besoin ».</li><li>Fumée blanche le jour (ajouter du vert ou de l'humide sur le feu), flamme la nuit.</li><li>Couleurs vives : couverture de survie côté argenté, veste haute visibilité.</li></ul>"}
+];
+var FOOD = [
+ {id:"jars",ic:"🫙",t:"Conserves en bocaux",k:"bocaux stérilisation conserve botulisme",b:
+ "<ul class='dots'><li><b>Fruits, confitures, tomates</b> (aliments acides) : stérilisation à 100 °C au bain-marie ou en stérilisateur, selon les temps du fabricant de bocaux.</li><li><b>Légumes peu acides, viandes, poissons</b> : risque de <b>botulisme</b> (toxine mortelle, sans odeur ni goût). Suivre strictement un guide reconnu (temps de stérilisation longs à 100 °C, ou autoclave à plus de 115 °C).</li><li>Bocaux et joints en bon état, joints neufs à chaque fois pour les bocaux à caoutchouc.</li><li>Étiqueter : contenu + date. Consommer dans l'année.</li></ul><div class='warnbox'>Jeter sans goûter tout bocal bombé, qui fuit, qui pétille à l'ouverture, ou dont le couvercle ne tient plus sous vide.</div>"},
+ {id:"dry",ic:"☀️",t:"Séchage et déshydratation",k:"séchage déshydrateur fruits légumes viande",b:
+ "<ul class='dots'><li>Fruits, légumes, herbes, champignons : tranches fines, déshydrateur ou four à 50–60 °C porte entrouverte, ou séchage à l'air sec et ventilé.</li><li>Viande séchée (jerky) : viande maigre, marinée salée, séchée à température suffisante pour la sécurité sanitaire (suivre une recette fiable).</li><li>Conserver au sec, en bocal ou sachet sous vide avec absorbeur d'oxygène, à l'abri de la lumière.</li></ul>"},
+ {id:"ferment",ic:"🥬",t:"Lacto-fermentation",k:"lacto fermentation choucroute légumes saumure",b:
+ "<ul class='dots'><li>Méthode ancienne, sans cuisson ni énergie : légumes + sel (environ 2 à 3 % du poids) ou saumure, tassés dans un bocal, à l'abri de l'air.</li><li>Choux (choucroute), carottes, betteraves, haricots verts, concombres.</li><li>Fermentation quelques jours à température ambiante, puis au frais. Conservation de plusieurs mois.</li><li>Les légumes doivent rester sous la saumure ; jeter en cas de moisissure colorée ou d'odeur de pourri.</li></ul>"},
+ {id:"longterm",ic:"📦",t:"Stockage longue durée",k:"stock riz pâtes légumineuses rotation durée conservation",b:
+ "<table><tr><th>Aliment</th><th>Conservation (au sec, au frais)</th></tr><tr><td>Riz blanc, pâtes</td><td>Plusieurs années en contenant hermétique</td></tr><tr><td>Légumineuses sèches</td><td>Plusieurs années (plus longues à cuire en vieillissant)</td></tr><tr><td>Sel, sucre, miel</td><td>Quasi illimitée</td></tr><tr><td>Conserves industrielles</td><td>Selon la DDM, souvent 2 à 5 ans</td></tr><tr><td>Huile</td><td>1 à 2 ans (rancit)</td></tr><tr><td>Farine blanche</td><td>Environ 1 an (charançons)</td></tr><tr><td>Riz complet, farine complète</td><td>Quelques mois (rancit)</td></tr></table><ul class='dots'><li>Stocker ce que tu manges déjà, et le faire tourner : utiliser le plus ancien, racheter.</li><li>Contenants hermétiques contre rongeurs et insectes ; quelques jours au congélateur avant stockage pour les farines et céréales.</li><li>Penser aux vitamines : fruits secs, conserves de légumes, multivitamines si stock très long.</li></ul>"},
+ {id:"garden",ic:"🌱",t:"Potager de survie",k:"potager légumes semences pommes de terre jardin",b:
+ "<ul class='dots'><li><b>Les plus nourrissants pour la surface</b> : pommes de terre, haricots secs, courges et potirons, pois, fèves, maïs.</li><li><b>Faciles et productifs</b> : courgettes, blettes, choux, poireaux, salades, radis, aromatiques.</li><li><b>Semences reproductibles</b> (variétés anciennes, non hybrides F1) : on peut récolter ses propres graines pour l'année suivante. Les conserver au sec et au frais, étiquetées.</li><li>Commencer petit (10 à 20 m²) pour apprendre : un potager s'apprend sur plusieurs saisons, pas en pleine crise.</li><li>Compost, paillage et récupération d'eau de pluie réduisent l'arrosage et les intrants.</li></ul>"}
+];
+
+/* ---------- énergie ---------- */
+var NRJDEF = { rows: [["Téléphone (1 charge)", 15, 1], ["Lampes LED", 5, 4], ["Radio", 3, 4], ["Box Internet", 10, 6], ["Ordinateur portable", 50, 2]], cap: 286, sol: 100, sun: 2 };
+var nrj = {
+  get: function () { return store.get("energy", NRJDEF); },
+  save: function (d) { store.set("energy", d); this.calc(); },
+  renderRows: function () {
+    var d = this.get(), h = "<table><tr><th>Appareil</th><th>W</th><th>h/jour</th><th></th></tr>";
+    for (var i = 0; i < d.rows.length; i++) { var r = d.rows[i]; h += "<tr><td><input value='" + esc(r[0]) + "' onchange='nrj.set(" + i + ",0,this.value)'></td><td style='width:70px'><input type='number' inputmode='decimal' value='" + r[1] + "' onchange='nrj.set(" + i + ",1,this.value)'></td><td style='width:70px'><input type='number' inputmode='decimal' step='0.5' value='" + r[2] + "' onchange='nrj.set(" + i + ",2,this.value)'></td><td style='width:36px'><button class='x btn sm' onclick='nrj.del(" + i + ")'>✕</button></td></tr>"; }
+    $("nrjRows").innerHTML = h + "</table>"; $("nrjCap").value = d.cap; $("nrjSol").value = d.sol; $("nrjSun").value = d.sun; this.calc();
+  },
+  set: function (i, j, v) { var d = this.get(); d.rows[i][j] = j ? (parseFloat(v) || 0) : v; this.save(d); },
+  del: function (i) { var d = this.get(); d.rows.splice(i, 1); store.set("energy", d); this.renderRows(); },
+  addRow: function () { var d = this.get(); d.rows.push(["Nouvel appareil", 10, 1]); store.set("energy", d); this.renderRows(); },
+  calc: function () {
+    var d = this.get(), need = 0; for (var i = 0; i < d.rows.length; i++) need += (+d.rows[i][1] || 0) * (+d.rows[i][2] || 0);
+    var usable = (+d.cap || 0) * 0.85, prod = (+d.sol || 0) * (+d.sun || 0) * 0.7, days = need ? usable / need : 0, bal = prod - need;
+    $("nrjOut").innerHTML = "<b>Résultat</b><div class='grid2' style='margin-top:8px'><div><div class='mut'>Consommation</div><div class='stat'>" + Math.round(need) + " Wh/j</div></div><div><div class='mut'>Sans soleil</div><div class='stat' style='color:" + (days >= 3 ? "var(--ok)" : "var(--warn)") + "'>" + (Math.round(days * 10) / 10).toString().replace(".", ",") + " j</div></div><div><div class='mut'>Production solaire</div><div class='stat'>" + Math.round(prod) + " Wh/j</div></div><div><div class='mut'>Bilan / jour</div><div class='stat' style='color:" + (bal >= 0 ? "var(--ok)" : "var(--red)") + "'>" + (bal >= 0 ? "+" : "") + Math.round(bal) + " Wh</div></div></div>" +
+      "<p class='mut'>Calcul avec 85 % de capacité utilisable (pertes de l'onduleur) et un rendement de 70 % du panneau. " + (bal < 0 ? "Pour être autonome en continu avec ce soleil, il faudrait environ " + Math.ceil(need / ((+d.sun || 1) * 0.7) / 10) * 10 + " W de panneaux, ou réduire la consommation." : "Ta production couvre ta consommation dans ces conditions.") + "</p>";
+  }
+};
+(function () { ["nrjCap", "nrjSol", "nrjSun"].forEach(function (id) { $(id).addEventListener("input", function () { var d = nrj.get(); d[id === "nrjCap" ? "cap" : id === "nrjSol" ? "sol" : "sun"] = parseFloat(this.value) || 0; nrj.save(d); }); }); })();
+
+/* ---------- équipement survivaliste ---------- */
+var SQCATS = [["cut","🔪","Outils de coupe"],["fire","🔥","Feu et cuisine"],["water","💧","Eau"],["power","⚡","Énergie et lumière"],["shelter","⛺","Abri et couchage"],["nav","🧭","Navigation et information"],["misc","🧰","Divers"]];
+var DEFSQ = [
+ ["cut","Couteau fixe — Morakniv Garberg (acier 3,2 mm, pleine soie) · ≈ 70–105 €"],["cut","Scie pliante — Bahco Laplander 396-LAP · ≈ 26–56 €"],["cut","Hachette — type Fiskars X7 (ou équivalent)"],["cut","Multi-outil — type Leatherman Wave+ (ou équivalent)"],["cut","Pierre à aiguiser / affûteur de poche"],
+ ["fire","Pierre à feu ferrocérium (ex. Light My Fire Army)"],["fire","Briquets + allumettes tempête en boîte étanche"],["fire","Réchaud à cartouche — MSR PocketRocket 2 · ≈ 40–50 €"],["fire","Cartouches de gaz (valve filetée) pour 14 jours"],["fire","Popote inox ou titane 1 L + couverts"],
+ ["water","Filtre — Sawyer Squeeze (0,1 µm) · ≈ 73–95 €"],["water","Pastilles de purification (Micropur, Aquatabs)"],["water","Filtre gravitaire pour la maison (ex. Katadyn BeFree Gravity 3 L)"],["water","Jerricans alimentaires 20 L (x2)"],["water","Gourde inox (peut chauffer sur le feu)"],
+ ["power","Station électrique LiFePO4 — EcoFlow River 3 Plus (286 Wh, 600 W) · ≈ 295–330 €"],["power","Panneau solaire pliable 100–200 W compatible"],["power","Radio dynamo/solaire — Midland ER300 Pro (USB-C, solaire, manivelle)"],["power","Lampe frontale — type Petzl Actik Core (rechargeable + AAA)"],["power","Piles AA lithium + chargeur USB"],
+ ["shelter","Tarp 3 × 3 m + paracorde 30 m + sardines"],["shelter","Duvet confort −5 °C"],["shelter","Matelas isolant (R ≥ 4)"],["shelter","Couvertures de survie (x2)"],["shelter","Sac à dos 50–65 L + housse pluie"],["shelter","Sacs étanches (2–3 tailles)"],
+ ["nav","Boussole à plaquette — type Silva Ranger"],["nav","Cartes IGN TOP 25 de la région et de la base de repli"],["nav","Miroir de signalisation + sifflet"],["nav","Carnet étanche + crayon"],
+ ["misc","Gants de travail cuir"],["misc","Ruban adhésif renforcé (duct tape)"],["misc","Kit couture + aiguilles fortes"],["misc","Kit de pêche de poche (avec carte de pêche)"],["misc","Pelle pliante"]
+];
+
+/* ---------- init ---------- */
+bindList(GUIDES, "gList", "gSearch");
+bindList(AID, "aList", "aSearch");
+bindList(SECG, "sList", "sSearch");
+bindFields("data-risk", "risk"); places.render(); risks.render(); neigh.render();
+bindList(PPEG, "ppeGList", "ppeGSearch"); ppe.render();
+var seq = new Inv("seq", "seq", SEQCATS, DEFSEQ, {cat:"seqNewCat", newN:"seqNewN", list:"seqList", pct:"seqPct", bar:"seqBar"}, "Équipement");
+bindList(SEQG, "seqGList", "seqGSearch"); seq.render();
+lvl.render(); renderBov(); bindList(BUSH, "bushList", "bushSearch"); bindList(FOOD, "foodList", "foodSearch"); bindFields("data-bad", "bad"); nrj.renderRows();
+var survEq = new Inv("survEq", "survEq", SQCATS, DEFSQ, {cat:"sqNewCat", newN:"sqNewN", list:"sqList", pct:"sqPct", bar:"sqBar"}, "Matériel"); survEq.render();
+bindFields("data-med", "med"); bindFields("data-plan", "plan");
+renderCountry(); bag.render(); stock.render(); renderHH(); msgs.render(); morse.render(); updUnitLbl(); netUpd();
+if (gps.last) gps.render();
+go(store.get("page", "home"));
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") { overlayOff(); closeDetail(); } });
+if ("serviceWorker" in navigator && location.protocol === "https:") { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
+</script>
+</body>
+</html>
